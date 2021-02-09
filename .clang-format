@@ -1,0 +1,2 @@
+# Defines the Chromium style for automatic reformatting.
+BasedOnStyle: Chromium
