@@ -27,6 +27,6 @@ device (i.e. computer/phone) aside from a compatible browser.
 This should allow them to be run under accounts without
 privileges to install software, and on Chrome OS, phones, etc.
 
-## Contrubutions
+## Contributions
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md).
