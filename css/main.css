@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1c1c1e;
+    color: lightgray;
+  }
+}
+
+.container {
+  
+}
+
+.flex {
+  display: flex;
+}
+
+.inRow {
+  width: 100%;
+  padding: 10px;
+}
+
+#no_bluetooth {
+  font-size: larger;
+  color: red;
+}
