@@ -1,0 +1,21 @@
+name: Push Audit
+
+on: push
+
+jobs:
+  textformat:
+    name: EditorConfig audit
+    runs-on: ubuntu-latest
+    env:
+      ALWAYS_LINT_ALL_FILES: false
+      EC_FIX_ERROR: false
+    steps:
+      - name: CheckoutCode
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: EditorConfig-Action
+        uses: zbeekman/EditorConfig-Action@master
+        env:
+          ALWAYS_LINT_ALL_FILES: false
+          EC_FIX_ERROR: false

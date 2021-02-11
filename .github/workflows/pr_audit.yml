@@ -1,0 +1,18 @@
+name: PR Audit
+on: pull_request
+
+jobs:
+  textformat:
+    name: EditorConfig audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: CheckoutCode
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: EditorConfig-Action
+        uses: zbeekman/EditorConfig-Action@master
+        env:
+          ALWAYS_LINT_ALL_FILES: false
+          EC_FIX_ERROR: false
