@@ -19,14 +19,20 @@ function $(id) {
 }
 
 function logInfo(msg) {
-  let status = $('status')
-  status.innerHTML = status.innerHTML + '</br>' + msg;
+  const status = $('status');
+  const br = document.createElement('br');
+  const text = document.createTextNode(msg);
+  status.appendChild(br);
+  status.appendChild(text);
   console.log(msg);
 }
 
 function logError(msg) {
-  let status = $('status')
-  status.innerHTML = status.innerHTML + '</br>' + msg;
+  const status = $('status');
+  const br = document.createElement('br');
+  const text = document.createTextNode(msg);
+  status.appendChild(br);
+  status.appendChild(text);
   console.error(msg);
 }
 

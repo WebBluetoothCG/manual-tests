@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-var testDevice;
 
 const testServices = ['0b30acec-193e-11eb-adc1-0242ac120002'];
 
@@ -34,9 +33,40 @@ function onGattDisconnected(evt) {
   logInfo(`Disconnected from GATT on device ${device.name}.`);
 }
 
-function readCharacteristic(gattServer) {
-  let decoder = new TextDecoder('utf-8');
-  gattServer.getPrimaryService(testServices[0])
+function startTest() {
+  clearStatus();
+  logInfo('Starting test');
+
+  var options = { acceptAllDevices: true };
+  if (testServices) {
+    logInfo(`Requesting Bluetooth device with optional service ${testServices}`);
+    options['optionalServices'] = testServices;
+  } else {
+    logInfo(`Requesting any Bluetooth device`);
+  }
+
+  $('btn_start_test').disabled = true;
+  var gattServer = undefined;
+
+  cleanup = function () {
+    $('btn_start_test').disabled = false;
+    if (gattServer) {
+      logInfo('Disconnecting from GATT.');
+      gattServer.disconnect();
+    }
+  }
+
+  navigator.bluetooth.requestDevice(options)
+    .then(device => {
+      logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
+      device.addEventListener('gattserverdisconnected', onGattDisconnected);
+      return device.gatt.connect();
+    })
+    .then(server => {
+      gattServer = server;
+      logInfo(`Connected to GATT, requesting service: ${testServices[0]}...`);
+      return server.getPrimaryService(testServices[0]);
+    })
     .then(service => {
       logInfo(
         `Got service, requesting characteristic ${testCharacteristic}...`);
@@ -47,56 +77,14 @@ function readCharacteristic(gattServer) {
       return characteristic.readValue();
     })
     .then(dataview => {
-      const endianNess = true;  // little-endian.
-      let val = dataview.getUint8(0, endianNess);
+      let val = dataview.getUint8(0);
       logInfo(`Got characteristic value \"${val}\".`);
+      cleanup();
     })
     .catch(error => {
       logError(`Unexpected failure: ${error}`);
+      cleanup();
     });
-}
-
-function connectGattServer(device) {
-  logInfo(`Connecting to GATT server for device \"${device.name}\"`);
-  device.gatt.connect()
-    .then(gattServer => {
-      logInfo(`Connected to GATT server for device \"${device.name}\"`);
-      readCharacteristic(gattServer);
-    })
-    .catch(error => {
-      logError(`Error connecting to GATT server for device \"${device.name}\"`);
-    });
-}
-
-/**
- * Start the test.
- */
-function connectDevice(optionalServices) {
-  logInfo('Starting test');
-  var options = { acceptAllDevices: true };
-  if (optionalServices) {
-    logInfo(`Requesting Bluetooth device with optional service ${optionalServices}`);
-    options['optionalServices'] = optionalServices;
-  } else {
-    logInfo(`Requesting any Bluetooth device`);
-  }
-
-  navigator.bluetooth.requestDevice(options)
-    .then(device => {
-      testDevice = device;
-      logInfo(`Got device name: \"${device.name}\"`);
-      logInfo(`Got device id: \"${device.id}\"`);
-      device.addEventListener('gattserverdisconnected', onGattDisconnected);
-      connectGattServer(device);
-    })
-    .catch(error => {
-      logError(`Got device id: \"${device.id}\"`);
-    });
-}
-
-function startTest() {
-  clearStatus();
-  connectDevice(testServices);
 }
 
 function init() {

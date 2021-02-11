@@ -37,8 +37,8 @@
         <div class="inRow">
           Press the button to load the code to the Espruino IDE.
           From there flash any Bluetooth capable Espruino device.
-          <br/>
-          <br/>
+          <br />
+          <br />
           View <a href="device_code.js" title="Device source code">source</a>.
         </div>
         <div class="inRow">
@@ -54,7 +54,7 @@
           Once running, start the test.
         </div>
         <div class="inRow">
-          <button id="btn_device_connect" type="button" onclick="startTest()">Start Test</button>
+          <button id="btn_start_test" type="button" onclick="startTest()">Start Test</button>
         </div>
       </div>
     </div>
@@ -62,7 +62,7 @@
     <p>Status:</p>
     <pre id='status'></pre>
   </div>
-  <div id="no_bluetooth" style="visibility: collapse;">
+  <div id="no_bluetooth" style="visibility: hidden;">
     This browser does not support Bluetooth.
   </div>
 </body>
