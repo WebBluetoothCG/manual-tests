@@ -37,7 +37,7 @@ function startTest() {
   clearStatus();
   logInfo('Starting test');
 
-  var options = { acceptAllDevices: true };
+  let options = { acceptAllDevices: true };
   if (testServices) {
     logInfo(`Requesting Bluetooth device with optional service ${testServices}`);
     options['optionalServices'] = testServices;
@@ -46,7 +46,7 @@ function startTest() {
   }
 
   $('btn_start_test').disabled = true;
-  var gattServer = undefined;
+  let gattServer = undefined;
 
   cleanup = function () {
     $('btn_start_test').disabled = false;
