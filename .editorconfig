@@ -1,11 +1,15 @@
 [*]
 charset = utf-8
 end_of_line = lf
-indent_size = 2
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.js]
+indent_size = 2
+block_comment_start = /*
+block_comment = *
+block_comment_end = */
+
 [*.py]
 indent_size = 4
-
