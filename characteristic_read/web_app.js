@@ -33,7 +33,7 @@ function onGattDisconnected(evt) {
   logInfo(`Disconnected from GATT on device ${device.name}.`);
 }
 
-function startTest() {
+async function startTest() {
   clearStatus();
   logInfo('Starting test');
 
@@ -48,43 +48,33 @@ function startTest() {
   $('btn_start_test').disabled = true;
   let gattServer = undefined;
 
-  cleanup = function () {
-    $('btn_start_test').disabled = false;
-    if (gattServer) {
-      logInfo('Disconnecting from GATT.');
-      gattServer.disconnect();
-    }
+  try {
+    const device = await navigator.bluetooth.requestDevice(options);
+
+    device.addEventListener('gattserverdisconnected', onGattDisconnected);
+    logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
+    gattServer = await device.gatt.connect();
+
+    logInfo(`Connected to GATT, requesting service: ${testServices[0]}...`);
+    const service = await gattServer.getPrimaryService(testServices[0]);
+
+    logInfo(`Got service, requesting characteristic ${testCharacteristic}...`);
+    const characteristic = await service.getCharacteristic(testCharacteristic);
+
+    logInfo(`Got characteristic, reading value...`);
+    const dataview = await characteristic.readValue();
+
+    const val = dataview.getUint8(0);
+    logInfo(`Got characteristic value \"${val}\".`);
+  } catch (error) {
+    logError(`Unexpected failure: ${error}`);
   }
 
-  navigator.bluetooth.requestDevice(options)
-    .then(device => {
-      logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
-      device.addEventListener('gattserverdisconnected', onGattDisconnected);
-      return device.gatt.connect();
-    })
-    .then(server => {
-      gattServer = server;
-      logInfo(`Connected to GATT, requesting service: ${testServices[0]}...`);
-      return server.getPrimaryService(testServices[0]);
-    })
-    .then(service => {
-      logInfo(
-        `Got service, requesting characteristic ${testCharacteristic}...`);
-      return service.getCharacteristic(testCharacteristic);
-    })
-    .then(characteristic => {
-      logInfo(`Got characteristic, reading value...`);
-      return characteristic.readValue();
-    })
-    .then(dataview => {
-      let val = dataview.getUint8(0);
-      logInfo(`Got characteristic value \"${val}\".`);
-      cleanup();
-    })
-    .catch(error => {
-      logError(`Unexpected failure: ${error}`);
-      cleanup();
-    });
+  $('btn_start_test').disabled = false;
+  if (gattServer) {
+    logInfo('Disconnecting from GATT.');
+    gattServer.disconnect();
+  }
 }
 
 function init() {
