@@ -14,14 +14,13 @@
  *  limitations under the License.
  */
 
-const testServices = ['0b30acec-193e-11eb-adc1-0242ac120002'];
-
+const testService = '0b30acec-193e-11eb-adc1-0242ac120002';
 const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 
 /**
  * Load the device code to the Espruino IDE.
  */
-function loadCode() {
+function loadEspruinoDeviceCode() {
   fetch('device_code.js').then(response => response.text()).then(data => {
     let url = 'http://www.espruino.com/webide?code=' + encodeURIComponent(data);
     window.open(url, '_window');
@@ -37,26 +36,25 @@ async function startTest() {
   clearStatus();
   logInfo('Starting test');
 
-  let options = { acceptAllDevices: true };
-  if (testServices) {
-    logInfo(`Requesting Bluetooth device with optional service ${testServices}`);
-    options['optionalServices'] = testServices;
-  } else {
-    logInfo(`Requesting any Bluetooth device`);
-  }
+  logInfo(`Requesting Bluetooth device with service ${testService}`);
 
   $('btn_start_test').disabled = true;
   let gattServer = undefined;
 
   try {
+    const options = {
+      filters: [
+        { services: [testService] }
+      ]
+    };
     const device = await navigator.bluetooth.requestDevice(options);
 
     device.addEventListener('gattserverdisconnected', onGattDisconnected);
     logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
     gattServer = await device.gatt.connect();
 
-    logInfo(`Connected to GATT, requesting service: ${testServices[0]}...`);
-    const service = await gattServer.getPrimaryService(testServices[0]);
+    logInfo(`Connected to GATT, requesting service: ${testService}...`);
+    const service = await gattServer.getPrimaryService(testService);
 
     logInfo(`Got service, requesting characteristic ${testCharacteristic}...`);
     const characteristic = await service.getCharacteristic(testCharacteristic);
@@ -65,9 +63,18 @@ async function startTest() {
     const dataview = await characteristic.readValue();
 
     const val = dataview.getUint8(0);
-    logInfo(`Got characteristic value \"${val}\".`);
+    // The expected value is hard-coded in device_code.js.
+    const expectedValue = 17;
+    if (val == expectedValue) {
+      logInfo(`Got expected characteristic value \"${val}\".`);
+      logError(`PASS`);
+    } else {
+      logError(`Expected value of ${expectedValue}, but got ${val}.`);
+      logError(`FAIL`);
+    }
   } catch (error) {
     logError(`Unexpected failure: ${error}`);
+    logError(`FAIL`);
   }
 
   $('btn_start_test').disabled = false;
