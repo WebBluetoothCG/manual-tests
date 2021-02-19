@@ -14,6 +14,8 @@
  *  limitations under the License.
  */
 
+let numErrors = 0;
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -28,6 +30,7 @@ function logInfo(msg) {
 }
 
 function logError(msg) {
+  numErrors += 1;
   const status = $('status');
   const br = document.createElement('br');
   const text = document.createTextNode(msg);
@@ -42,4 +45,15 @@ function clearStatus() {
 
 function isBluetoothSupported() {
   return navigator.bluetooth !== undefined;
+}
+
+function testDone() {
+  let result = $('test_result');
+  if (numErrors) {
+    result.innerHTML = 'FAIL';
+    result.classList.add('fail');
+  } else {
+    result.innerHTML = 'PASS';
+    result.classList.add('pass');
+  }
 }

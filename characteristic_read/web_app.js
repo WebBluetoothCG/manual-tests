@@ -14,7 +14,11 @@
  *  limitations under the License.
  */
 
-const testService = '0b30acec-193e-11eb-adc1-0242ac120002';
+// Espruino devices publish a UART service by default.
+const nordicUARTService  = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+// The test service defined in device_code.js
+const testService        = '0b30acec-193e-11eb-adc1-0242ac120002';
+// The test characteristic defined in device_code.js
 const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 
 /**
@@ -44,8 +48,9 @@ async function startTest() {
   try {
     const options = {
       filters: [
-        { services: [testService] }
-      ]
+        { services: [nordicUARTService] }
+      ],
+      optionalServices: [testService]
     };
     const device = await navigator.bluetooth.requestDevice(options);
 
@@ -66,17 +71,15 @@ async function startTest() {
     // The expected value is hard-coded in device_code.js.
     const expectedValue = 17;
     if (val == expectedValue) {
-      logInfo(`Got expected characteristic value \"${val}\".`);
-      logError(`PASS`);
+      logInfo(`Got expected characteristic value ${val}.`);
     } else {
       logError(`Expected value of ${expectedValue}, but got ${val}.`);
-      logError(`FAIL`);
     }
   } catch (error) {
     logError(`Unexpected failure: ${error}`);
-    logError(`FAIL`);
   }
 
+  testDone();
   $('btn_start_test').disabled = false;
   if (gattServer) {
     logInfo('Disconnecting from GATT.');
