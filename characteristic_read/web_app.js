@@ -15,9 +15,9 @@
  */
 
 // Espruino devices publish a UART service by default.
-const nordicUARTService  = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const nordicUARTService = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 // The test service defined in device_code.js
-const testService        = '0b30acec-193e-11eb-adc1-0242ac120002';
+const testService = '0b30acec-193e-11eb-adc1-0242ac120002';
 // The test characteristic defined in device_code.js
 const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 

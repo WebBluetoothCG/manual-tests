@@ -41,6 +41,10 @@ function logError(msg) {
 
 function clearStatus() {
   $('status').innerHTML = '';
+  let result = $('test_result');
+  result.innerHTML = '';
+  result.classList.remove('pass');
+  result.classList.remove('fail');
 }
 
 function isBluetoothSupported() {
