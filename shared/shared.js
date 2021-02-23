@@ -20,6 +20,13 @@ function $(id) {
   return document.getElementById(id);
 }
 
+// Return the Nordic primary Bluetooth service for Espruino devices.
+function getEspruinoPrimaryService() {
+  // The Nordic UART Service (NUS) UUID.
+  // https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/include/bluetooth/services/nus.html
+  return '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+}
+
 function logInfo(msg) {
   const status = $('status');
   const br = document.createElement('br');
