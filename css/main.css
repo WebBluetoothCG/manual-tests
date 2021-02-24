@@ -1,0 +1,40 @@
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.pass {
+  color: darkgreen;
+}
+
+.fail {
+  color: red;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1c1c1e;
+    color: lightgray;
+  }
+
+  .pass {
+    color: lightgreen;
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.inRow {
+  width: 100%;
+  padding: 10px;
+}
+
+#no_bluetooth {
+  font-size: larger;
+  color: red;
+}
