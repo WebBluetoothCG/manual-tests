@@ -19,6 +19,10 @@ let isConnected = false;
 let debug = '?';
 
 function updateScreen() {
+  if (typeof g === 'undefined') {
+    // Device has no graphics device (i.e. screen).
+    return;
+  }
   g.clear();
   g.setFontBitmap();
   g.drawString('Current Value:');
