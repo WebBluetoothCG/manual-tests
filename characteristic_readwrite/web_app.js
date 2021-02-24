@@ -67,7 +67,7 @@ async function startTest() {
     await characteristic.writeValueWithResponse(new Uint32Array([firstValue]));
 
     let dataview = await characteristic.readValue();
-    let val = dataview.getUint32(0, /*littleEndian=*/ true);
+    let val = dataview.getUint32(0, /*littleEndian=*/true);
     if (val != firstValue) {
       throw `expected ${firstValue} but read ${val}`;
     }
@@ -77,7 +77,7 @@ async function startTest() {
     await characteristic.writeValueWithResponse(new Uint32Array([secondValue]));
 
     dataview = await characteristic.readValue();
-    val = dataview.getUint32(0, /*littleEndian=*/ true);
+    val = dataview.getUint32(0, /*littleEndian=*/true);
     if (val != secondValue) {
       throw `expected ${secondValue} but read ${val}`;
     }

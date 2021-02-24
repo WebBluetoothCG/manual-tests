@@ -50,7 +50,7 @@ function onInit() {
         notify: false,
         description: 'Single read-write characteristic',
         onWrite: function(evt) {
-          data[0] = new DataView(evt.data).getUint32(0, /*littleEndian=*/ true);
+          data[0] = new DataView(evt.data).getUint32(0, /*littleEndian=*/true);
           debug = 'onWrite';
           setTimeout(updateScreen(), 100);
         },
