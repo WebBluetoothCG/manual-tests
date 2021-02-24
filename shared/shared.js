@@ -40,6 +40,7 @@ function logError(msg) {
 }
 
 function clearStatus() {
+  numErrors = 0;
   $('status').innerHTML = '';
   let result = $('test_result');
   result.innerHTML = '';
