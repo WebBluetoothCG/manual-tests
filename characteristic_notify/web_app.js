@@ -60,13 +60,13 @@ async function startTest() {
   }
 
   const checkCharacteristicValue = function(value) {
-    if (value < 1 || value > 999) {
+    if (value < 1 || value > 9999) {
       throw `Invalid characteristic value ${value}. Should be 1 <= val <= 999.`;
     }
     if (!lastValue) {
       return;
     }
-    if (lastValue === 999) {
+    if (lastValue === 9999) {
       if (value !== 1) {
         throw `Expected characteristic value 1, actual ${value}.`;
       }
