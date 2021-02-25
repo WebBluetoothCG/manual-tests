@@ -46,8 +46,7 @@ async function startTest() {
   let updateNum = 0;
   let lastValue = null;
 
-  const resetTest =
-      async function() {
+  const resetTest = async () => {
     if (notifyCharacteristic) {
       await notifyCharacteristic.stopNotifications();
     }
@@ -59,7 +58,7 @@ async function startTest() {
     $('btn_load_code').disabled = false;
   }
 
-  const checkCharacteristicValue = function(value) {
+  const checkCharacteristicValue = (value) => {
     if (value < 1 || value > 9999) {
       throw `Invalid characteristic value ${value}. Should be 1 <= val <= 999.`;
     }
@@ -77,8 +76,7 @@ async function startTest() {
     }
   }
 
-  const onCharacteristicChanged =
-      function(evt) {
+  const onCharacteristicChanged = (evt) => {
     updateNum += 1;
     try {
       const characteristic = evt.target;
@@ -101,7 +99,7 @@ async function startTest() {
 
   try {
     const options = {
-      filters: [{services: [getEspruinoPrimaryService()]}],
+      filters: [{ services: [getEspruinoPrimaryService()] }],
       optionalServices: [testService]
     };
     logInfo(`Requesting Bluetooth device with service ${testService}`);
@@ -125,7 +123,7 @@ async function startTest() {
 
     notifyCharacteristic = await characteristic.startNotifications();
     notifyCharacteristic.addEventListener(
-        'characteristicvaluechanged', onCharacteristicChanged);
+      'characteristicvaluechanged', onCharacteristicChanged);
   } catch (error) {
     logError(`Unexpected failure: ${error}`);
     resetTest();
