@@ -43,6 +43,7 @@ async function startTest() {
   logInfo(`Requesting Bluetooth device with service ${testService}`);
 
   $('btn_start_test').disabled = true;
+  $('btn_load_code').disabled = true;
   let gattServer = undefined;
 
   try {
@@ -81,6 +82,7 @@ async function startTest() {
 
   testDone();
   $('btn_start_test').disabled = false;
+  $('btn_load_code').disabled = false;
   if (gattServer) {
     logInfo('Disconnecting from GATT.');
     gattServer.disconnect();
