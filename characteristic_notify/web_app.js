@@ -18,7 +18,7 @@
 const testService = '02fc549a-244c-11eb-adc1-0242ac120002';
 // The test characteristic defined in device_code.js
 const testCharacteristic = '02fc549a-244c-11eb-adc1-0242ac120002';
-const requiredNumUpdates = 2;
+const requiredNumUpdates = 100;
 
 /**
  * Load the device code to the Espruino IDE.
@@ -44,6 +44,7 @@ async function startTest() {
   let gattServer = undefined;
   let notifyCharacteristic = undefined;
   let updateNum = 0;
+  let lastValue = null;
 
   const resetTest =
       async function() {
@@ -58,17 +59,33 @@ async function startTest() {
     $('btn_load_code').disabled = false;
   }
 
+  const checkCharacteristicValue = function(value) {
+    if (value < 1 || value > 999) {
+      throw `Invalid characteristic value ${value}. Should be 1 <= val <= 999.`;
+    }
+    if (!lastValue) {
+      return;
+    }
+    if (lastValue === 999) {
+      if (value !== 1) {
+        throw `Expected characteristic value 1, actual ${value}.`;
+      }
+      return;
+    }
+    if (value !== (lastValue + 1)) {
+      throw `Expected characteristic value ${lastValue + 1}, actual ${value}.`;
+    }
+  }
+
   const onCharacteristicChanged =
       function(evt) {
     updateNum += 1;
     try {
       const characteristic = evt.target;
       const dataview = characteristic.value;
-      const val = dataview.getUint32(0, /*littleEndian=*/ true);
-      if (val == 0) {
-        throw `Characteristic value (${val}) should be > 0.`;
-      }
-      logInfo(`Update #${updateNum} with value ${val}.`);
+      const val = dataview.getUint32(0, /*littleEndian=*/true);
+      checkCharacteristicValue(val);
+      lastValue = val;
       if (updateNum == requiredNumUpdates) {
         logInfo('Test success.');
       }
@@ -102,7 +119,7 @@ async function startTest() {
 
     logInfo(`Got characteristic, reading value...`);
     let dataview = await characteristic.readValue();
-    let val = dataview.getUint32(0, /*littleEndian=*/ true);
+    let val = dataview.getUint32(0, /*littleEndian=*/true);
     if (val == 0)
       throw `Characteristic value (${val}) should be > 0.`;
 

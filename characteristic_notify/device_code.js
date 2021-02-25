@@ -38,9 +38,9 @@ function updateScreen() {
 
 function updateValue() {
   data[0] = data[0] + 1;
-  if (data[0] == 9999) {
+  if (data[0] == 10000) {
     // Limit to four digits for display on small screens.
-    data[0] = [0];
+    data[0] = 0;
   }
   if (isConnected) {
     NRF.updateServices({
@@ -50,7 +50,6 @@ function updateValue() {
       }
     });
   }
-  updateScreen();
 }
 
 function onInit() {
@@ -87,5 +86,6 @@ function onInit() {
 
   updateScreen();
 
-  setInterval(updateValue, 2000);
+  setInterval(updateScreen, 1000);
+  setInterval(updateValue, 40);
 }
