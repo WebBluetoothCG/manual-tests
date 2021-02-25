@@ -29,7 +29,7 @@ function onInit() {
         description: 'Single read-only characteristic',
       }
     }
-  }, { advertise: ['0b30acec-193e-11eb-adc1-0242ac120002'] });
+  });
 
   NRF.on('disconnect', (addr) => {
     // Provide feedback that device no longer connected.
