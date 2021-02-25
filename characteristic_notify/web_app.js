@@ -80,8 +80,8 @@ async function startTest() {
     updateNum += 1;
     try {
       const characteristic = evt.target;
-      const dataview = characteristic.value;
-      const val = dataview.getUint32(0, /*littleEndian=*/true);
+      const dataView = characteristic.value;
+      const val = dataView.getUint32(0, /*littleEndian=*/true);
       checkCharacteristicValue(val);
       lastValue = val;
       if (updateNum == requiredNumUpdates) {
@@ -116,8 +116,8 @@ async function startTest() {
     const characteristic = await service.getCharacteristic(testCharacteristic);
 
     logInfo(`Got characteristic, reading value...`);
-    let dataview = await characteristic.readValue();
-    let val = dataview.getUint32(0, /*littleEndian=*/true);
+    let dataView = await characteristic.readValue();
+    let val = dataView.getUint32(0, /*littleEndian=*/true);
     if (val == 0)
       throw `Characteristic value (${val}) should be > 0.`;
 
