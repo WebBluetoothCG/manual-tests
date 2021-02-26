@@ -23,6 +23,14 @@ body {
   .pass {
     color: lightgreen;
   }
+
+  a {
+    color: #8AB4F8;
+  }
+
+  a:visited {
+    color: #b18af8;
+  }
 }
 
 .flex {
