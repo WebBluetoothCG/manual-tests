@@ -134,10 +134,10 @@ function init() {
   if (!isBluetoothSupported()) {
     console.log('Bluetooth not supported.');
     $('have_bluetooth').style.display = 'none';
-    if (window.location.protocol == 'https') {
+    if (window.isSecureContext == 'https') {
       $('no_bluetooth').style.visibility = 'visible';
     } else {
-      $('no_https').style.visibility = 'visible';
+      $('insecure_context').style.visibility = 'visible';
     }
   }
 }
