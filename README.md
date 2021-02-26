@@ -18,6 +18,9 @@ The benefit to this approach is:
 These tests are **not browser specific**, and should work with any
 browser supporting Web Bluetooth.
 
+To run these tests visit
+[webbluetoothcg.github.io/manual-tests](https://webbluetoothcg.github.io/manual-tests/).
+
 **Note**: This is not an officially supported Google product.
 
 ## Prerequisites
