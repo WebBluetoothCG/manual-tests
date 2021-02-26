@@ -118,8 +118,7 @@ async function startTest() {
     logInfo(`Got characteristic, reading value...`);
     let dataView = await characteristic.readValue();
     let val = dataView.getUint32(0, /*littleEndian=*/true);
-    if (val == 0)
-      throw `Characteristic value (${val}) should be > 0.`;
+    checkCharacteristicValue(val);
 
     notifyCharacteristic = await characteristic.startNotifications();
     notifyCharacteristic.addEventListener(
