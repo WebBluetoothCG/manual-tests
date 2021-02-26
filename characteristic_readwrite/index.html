@@ -62,8 +62,14 @@
     <p>Status: <span id='test_result'></span></p>
     <pre id='status'></pre>
   </div>
-  <div id="no_bluetooth" style="visibility: hidden;">
-    This browser does not support Bluetooth.
+  <!-- Only one of the two below will be visible. -->
+  <div id="no_bluetooth" class="no-bluetooth" style="visibility: hidden;">
+    Bluetooth is not available.
+  </div>
+  <div id="insecure_context" class="no-bluetooth" style="visibility: hidden;">
+    Bluetooth is not available. Bluetooth requires a secure context (HTTPS).
+    For development purposes it does support HTTP, but only the on the loopback
+    adapter (i.e. "localhost").
   </div>
 </body>
 

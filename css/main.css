@@ -34,7 +34,7 @@ body {
   padding: 10px;
 }
 
-#no_bluetooth {
+.no-bluetooth {
   font-size: larger;
   color: red;
 }
