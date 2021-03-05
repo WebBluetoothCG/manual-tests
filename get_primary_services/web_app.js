@@ -97,9 +97,9 @@ async function startTest() {
       logText.push(`  No characteristics`);
     } else {
       characteristics.forEach(characteristic => {
-        logText.push(`  Characteristic UUID: ${characteristics.uuid}`);
+        logText.push(`  Characteristic UUID: ${characteristic.uuid}`);
         logText.push(`   Props: ${getCharacteristicProperties(characteristic.properties)}`);
-        if (service.uuid == testServiceUUID) {
+        if (characteristic.uuid == testCharacteristicUUID) {
           verifyProperties(characteristic.properties);
         }
       });
