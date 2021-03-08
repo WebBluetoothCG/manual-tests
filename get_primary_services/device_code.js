@@ -50,7 +50,7 @@ function randomBoolean() {
 }
 
 function createTestServices() {
-  const checkedServices = {
+  const checkedCharacteristics = {
     '3f2b9c10-7dce-11eb-9439-0242ac130002': {
       value: data.buffer,
       broadcast: false,
@@ -65,29 +65,31 @@ function createTestServices() {
       value: data.buffer,
       broadcast: true,
       readable: false,
-      writable: false,
-      notify: true,
+      writable: true,
+      notify: false,
       indicate: true,
       description: null,
+      onWrite : function(evt) {
+        console.log("Got ", evt.data);
+      }
     }
   };
 
-  // Add some more randomm characteristics. This is just for load testing to
+  // Add some more random characteristics. This is just for load testing to
   // test of the browser can handle a reasonable number of characteristics.
   //
-  // The nRF52832 (used by the Espruino) has limited resources, and in testing
-  // generally will only broadcast that it has six characteristics.
-  let uncheckedServices = {};
+  // The nRF52832 (used by the Espruino) has limited resources. In testing
+  // will only list about six characteristics.
+  let uncheckedCharacteristics = {};
   for (let i = 0; i < 10; i++) {
     // Make the last two characters of the UUID the characteristic index. This
-    // Is only to make it easier to debug as the character can be easily
-    // identified.
+    // is to make it easier to debug as the characters can be easily identified.
     let digits = i.toString();
     if (digits.length == 1)
       digits = '0' + digits;
     const uuid = generateUUID().replace(/..$/, digits);
 
-    uncheckedServices[uuid] = {
+    uncheckedCharacteristics[uuid] = {
       value: data.buffer,
       broadcast: randomBoolean(),
       readable: randomBoolean(),
@@ -99,8 +101,8 @@ function createTestServices() {
   }
 
   return {
-    '3f2b9742-7dce-11eb-9439-0242ac130002': checkedServices,
-    '6fc096cc-803b-11eb-9439-0242ac130002': uncheckedServices
+    '3f2b9742-7dce-11eb-9439-0242ac130002': checkedCharacteristics,
+    '6fc096cc-803b-11eb-9439-0242ac130002': uncheckedCharacteristics
   };
 }
 

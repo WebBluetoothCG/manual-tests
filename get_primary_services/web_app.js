@@ -15,9 +15,11 @@
  */
 
 // The test service defined in device_code.js
-const testServiceUUID = '3f2b9742-7dce-11eb-9439-0242ac130002';
-// The test characteristic defined in device_code.js
-const testCharacteristicUUID = '3f2b9c10-7dce-11eb-9439-0242ac130002';
+const testServiceUUIDs = ['3f2b9742-7dce-11eb-9439-0242ac130002',
+  '6fc096cc-803b-11eb-9439-0242ac130002'];
+// The test characteristics defined in device_code.js
+const firstCharacteristicUUID = '3f2b9c10-7dce-11eb-9439-0242ac130002';
+const secondCharacteristicUUID = 'dcc030e4-8035-11eb-9439-0242ac130002';
 
 /**
  * Load the device code to the Espruino IDE.
@@ -52,29 +54,47 @@ async function startTest() {
     $('btn_load_code').disabled = false;
   }
 
-  // Verify the properties of |testCharacteristicUUID|, which should match
+  // Verify the characteristic properties have the expected values.
+  const verifyProperties = (characteristic, expectedTrue, expectedFalse) => {
+    expectedTrue.forEach(propName => {
+      if (characteristic.properties[propName] !== true)
+        throw `Expected property "${propName}" to be true for characteristic ${characteristic.uuid}`;
+    });
+    expectedFalse.forEach(propName => {
+      if (characteristic.properties[propName] === true)
+        throw `Expected property "${propName}" to be false for characteristic ${characteristic.uuid}`;
+    });
+  };
+
+  // Verify the properties of |firstCharacteristicUUID|, which should match
   // those set in device_code.js.
-  const verifyProperties = (properties) => {
+  const verifyFirstCharacteristicProperties = (characteristic) => {
     const trueProps = ['read', 'notify'];
     const falseProps = ['broadcast', 'writeWithoutResponse', 'write',
-      'indicate', 'authenticatedSignedWrites',
-      'reliableWrite', 'writableAuxiliaries'];
+      'indicate', 'authenticatedSignedWrites', 'reliableWrite',
+      'writableAuxiliaries'];
 
-    trueProps.forEach(propName => {
-      if (!properties[propName])
-        throw 'Expected property ${propName} to be true';
-    });
-    falseProps.forEach(propName => {
-      if (properties[propName])
-        throw 'Expected property ${propName} to be false';
-    });
+    verifyProperties(characteristic, trueProps, falseProps);
+  };
+
+  // Espruino does not set extended properties, so reliableWrite and
+  // writableAuxiliaries is always false.
+  const alwaysFalseProperties = ['reliableWrite', 'writableAuxiliaries'];
+
+  // Verify the properties of |secondCharacteristicUUID|, which should match
+  // those set in device_code.js.
+  const verifySecondCharacteristicProperties = (characteristic) => {
+    const trueProps = ['broadcast', 'write', 'writeWithoutResponse', 'indicate'];
+    const falseProps = ['read', 'notify',
+      'authenticatedSignedWrites'].concat(alwaysFalseProperties);
+    verifyProperties(characteristic, trueProps, falseProps);
   };
 
   // Get a string of all properties set to true.
   const getCharacteristicProperties = (properties) => {
     const propNames = ['read', 'notify', 'broadcast', 'writeWithoutResponse',
-      'write', 'indicate', 'authenticatedSignedWrites', 'reliableWrite',
-      'writableAuxiliaries'];
+      'write', 'indicate',
+      'authenticatedSignedWrites'].concat(alwaysFalseProperties);
 
     let enabledProps = [];
     propNames.forEach(propName => {
@@ -92,6 +112,8 @@ async function startTest() {
     let logText = [
       ` Service UUID: ${service.uuid}, isPrimary: ${service.isPrimary}`
     ];
+    if (service.device != remoteDevice)
+      throw 'Service device does not match connected device';
     const characteristics = await service.getCharacteristics();
     if (!characteristics.length) {
       logText.push(`  No characteristics`);
@@ -99,8 +121,10 @@ async function startTest() {
       characteristics.forEach(characteristic => {
         logText.push(`  Characteristic UUID: ${characteristic.uuid}`);
         logText.push(`   Props: ${getCharacteristicProperties(characteristic.properties)}`);
-        if (characteristic.uuid == testCharacteristicUUID) {
-          verifyProperties(characteristic.properties);
+        if (characteristic.uuid == firstCharacteristicUUID) {
+          verifyFirstCharacteristicProperties(characteristic);
+        } else if (characteristic.uuid == secondCharacteristicUUID) {
+          verifySecondCharacteristicProperties(characteristic);
         }
       });
     }
@@ -110,13 +134,13 @@ async function startTest() {
   try {
     const options = {
       filters: [{ services: [getEspruinoPrimaryService()] }],
-      optionalServices: [testServiceUUID]
+      optionalServices: testServiceUUIDs
     };
-    logInfo(`Requesting Bluetooth device with service ${testServiceUUID}`);
+    logInfo(`Requesting Bluetooth device with services ${JSON.stringify(testServiceUUIDs)}`);
     remoteDevice = await navigator.bluetooth.requestDevice(options);
     logInfo(`Device: ID: ${remoteDevice.id}, name: \"${remoteDevice.name}\"`),
 
-    remoteDevice.addEventListener('gattserverdisconnected', onGattDisconnected);
+      remoteDevice.addEventListener('gattserverdisconnected', onGattDisconnected);
     gattServer = await remoteDevice.gatt.connect();
 
     logInfo(`Connected to GATT, requesting primary services...`);
