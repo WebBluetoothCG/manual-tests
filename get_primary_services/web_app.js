@@ -41,6 +41,7 @@ async function startTest() {
   $('btn_start_test').disabled = true;
   $('btn_load_code').disabled = true;
   let gattServer = undefined;
+  let remoteDevice = undefined;
 
   const resetTest = async () => {
     if (gattServer && gattServer.connected) {
@@ -89,7 +90,6 @@ async function startTest() {
 
   const logService = async (service) => {
     let logText = [
-      `Device: ID: ${service.device.id}, name: \"${service.device.name}\"`,
       ` Service UUID: ${service.uuid}, isPrimary: ${service.isPrimary}`
     ];
     const characteristics = await service.getCharacteristics();
@@ -113,11 +113,11 @@ async function startTest() {
       optionalServices: [testServiceUUID]
     };
     logInfo(`Requesting Bluetooth device with service ${testServiceUUID}`);
-    const device = await navigator.bluetooth.requestDevice(options);
+    remoteDevice = await navigator.bluetooth.requestDevice(options);
+    logInfo(`Device: ID: ${remoteDevice.id}, name: \"${remoteDevice.name}\"`),
 
-    device.addEventListener('gattserverdisconnected', onGattDisconnected);
-    logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
-    gattServer = await device.gatt.connect();
+    remoteDevice.addEventListener('gattserverdisconnected', onGattDisconnected);
+    gattServer = await remoteDevice.gatt.connect();
 
     logInfo(`Connected to GATT, requesting primary services...`);
     const services = await gattServer.getPrimaryServices();

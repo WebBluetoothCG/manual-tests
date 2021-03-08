@@ -36,22 +36,79 @@ function updateScreen() {
   g.flip();
 }
 
+// This function is from:
+// https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+function randomBoolean() {
+  return Math.random() < 0.5;
+}
+
+function createTestServices() {
+  const checkedServices = {
+    '3f2b9c10-7dce-11eb-9439-0242ac130002': {
+      value: data.buffer,
+      broadcast: false,
+      readable: true,
+      writable: false,
+      notify: true,
+      indicate: false,
+      description: 'Characteristic 1',
+    },
+    // Characteristic #2 has opposite values as #1.
+    'dcc030e4-8035-11eb-9439-0242ac130002': {
+      value: data.buffer,
+      broadcast: true,
+      readable: false,
+      writable: false,
+      notify: true,
+      indicate: true,
+      description: null,
+    }
+  };
+
+  // Add some more randomm characteristics. This is just for load testing to
+  // test of the browser can handle a reasonable number of characteristics.
+  //
+  // The nRF52832 (used by the Espruino) has limited resources, and in testing
+  // generally will only broadcast that it has six characteristics.
+  let uncheckedServices = {};
+  for (let i = 0; i < 10; i++) {
+    // Make the last two characters of the UUID the characteristic index. This
+    // Is only to make it easier to debug as the character can be easily
+    // identified.
+    let digits = i.toString();
+    if (digits.length == 1)
+      digits = '0' + digits;
+    const uuid = generateUUID().replace(/..$/, digits);
+
+    uncheckedServices[uuid] = {
+      value: data.buffer,
+      broadcast: randomBoolean(),
+      readable: randomBoolean(),
+      writable: randomBoolean(),
+      notify: randomBoolean(),
+      indicate: randomBoolean(),
+      description: `Characteristic ${i}`
+    };
+  }
+
+  return {
+    '3f2b9742-7dce-11eb-9439-0242ac130002': checkedServices,
+    '6fc096cc-803b-11eb-9439-0242ac130002': uncheckedServices
+  };
+}
+
 function onInit() {
   // Put into a known state.
   digitalWrite(LED, isConnected);
 
-  NRF.setServices({
-    '3f2b9742-7dce-11eb-9439-0242ac130002': {
-      '3f2b9c10-7dce-11eb-9439-0242ac130002': {
-        value: data.buffer,
-        broadcast: false,
-        readable: true,
-        writable: false,
-        notify: true,
-        description: 'Notify characteristic',
-      }
-    }
-  });
+  NRF.setServices(createTestServices());
 
   NRF.on('disconnect', (addr) => {
     // Provide feedback that device no longer connected.
