@@ -30,7 +30,7 @@
   <h1>Read-only Characteristic</h1>
   <p>This is a simple test to read and display a single characteristic value.
   </p>
-  <div id="have_bluetooth" style="visibility: visible;">
+  <div id="bluetooth_available" style="visibility: visible;">
     <h2>Step 1</h2>
     <div class="container">
       <div class="flex">
@@ -63,10 +63,10 @@
     <pre id='status'></pre>
   </div>
   <!-- Only one of the two below will be visible. -->
-  <div id="no_bluetooth" class="no-bluetooth" style="visibility: hidden;">
+  <div id="bluetooth_none" class="no-bluetooth" style="visibility: hidden;">
     Bluetooth is not available.
   </div>
-  <div id="insecure_context" class="no-bluetooth" style="visibility: hidden;">
+  <div id="bluetooth_insecure" class="no-bluetooth" style="visibility: hidden;">
     Bluetooth is not available. Bluetooth requires a secure context (HTTPS).
     For development purposes it does support HTTP, but only the on the loopback
     adapter (i.e. "localhost").

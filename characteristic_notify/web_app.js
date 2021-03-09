@@ -133,11 +133,18 @@ async function startTest() {
 function init() {
   if (!isBluetoothSupported()) {
     console.log('Bluetooth not supported.');
-    $('have_bluetooth').style.display = 'none';
+    $('bluetooth_available').style.display = 'none';
     if (window.isSecureContext == 'https') {
-      $('no_bluetooth').style.visibility = 'visible';
+      $('bluetooth_none').style.visibility = 'visible';
     } else {
-      $('insecure_context').style.visibility = 'visible';
+      $('bluetooth_insecure').style.visibility = 'visible';
     }
+    return;
+  }
+
+  const available = navigator.bluetooth.getAvailability();
+  if (!available) {
+    $('bluetooth_available').style.display = 'none';
+    $('bluetooth_unavailable').style.visibility = 'visible';
   }
 }
