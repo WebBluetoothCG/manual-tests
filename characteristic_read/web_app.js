@@ -98,5 +98,12 @@ function init() {
     } else {
       $('bluetooth_insecure').style.visibility = 'visible';
     }
+    return;
+  }
+
+  const available = navigator.bluetooth.getAvailability();
+  if (!available) {
+    $('bluetooth_available').style.display = 'none';
+    $('bluetooth_unavailable').style.visibility = 'visible';
   }
 }
