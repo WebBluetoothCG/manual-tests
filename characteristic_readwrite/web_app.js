@@ -21,6 +21,8 @@ const testService = '1c84b596-222c-11eb-adc1-0242ac120002';
 // The test characteristic defined in device_code.js
 const testCharacteristic = '1c84b91a-222c-11eb-adc1-0242ac120002';
 
+let gattServer = undefined;
+
 /**
  * Load the device code to the Espruino IDE.
  */
@@ -34,6 +36,7 @@ function loadEspruinoDeviceCode() {
 function onGattDisconnected(evt) {
   const device = evt.target;
   logInfo(`Disconnected from GATT on device ${device.name}.`);
+  assertFalse(gattServer.connected, 'Server connected');
 }
 
 async function startTest() {
@@ -44,24 +47,29 @@ async function startTest() {
 
   $('btn_start_test').disabled = true;
   $('btn_load_code').disabled = true;
-  let gattServer = undefined;
 
   try {
     const options = {
       filters: [{services: [nordicUARTService]}],
       optionalServices: [testService]
     };
+    logInfo(`Requesting Bluetooth device with service ${testService}`);
     const device = await navigator.bluetooth.requestDevice(options);
 
     device.addEventListener('gattserverdisconnected', onGattDisconnected);
     logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
     gattServer = await device.gatt.connect();
+    assertEquals(gattServer.device, device, 'Server device mismatch');
+    assertTrue(gattServer.connected, 'server.connected should be true');
 
     logInfo(`Connected to GATT, requesting service: ${testService}...`);
     const service = await gattServer.getPrimaryService(testService);
+    assertEquals(service.device, device, 'service device mismatch');
 
-    logInfo(`Got service, requesting characteristic ${testCharacteristic}...`);
+    logInfo(`Connected to service uuid:${service.uuid}, primary:${service.isPrimary}`);
+    logInfo(`Requesting characteristic ${testCharacteristic}...`);
     const characteristic = await service.getCharacteristic(testCharacteristic);
+    assertEquals(service.device, device, 'Characteristic service mismatch');
 
     const firstValue = 1999;
     logInfo(`Got characteristic, writing value ${firstValue}...`);
@@ -69,9 +77,7 @@ async function startTest() {
 
     let dataview = await characteristic.readValue();
     let val = dataview.getUint32(0, /*littleEndian=*/true);
-    if (val != firstValue) {
-      throw `expected ${firstValue} but read ${val}`;
-    }
+    assertEquals(firstValue, val, 'Incorrect first value');
 
     const secondValue = 2012;
     logInfo(`Got characteristic, writing value ${secondValue}...`);
@@ -79,9 +85,7 @@ async function startTest() {
 
     dataview = await characteristic.readValue();
     val = dataview.getUint32(0, /*littleEndian=*/true);
-    if (val != secondValue) {
-      throw `expected ${secondValue} but read ${val}`;
-    }
+    assertEquals(secondValue, val, 'Incorrect second value');
 
     logInfo('Test passed.');
   } catch (error) {

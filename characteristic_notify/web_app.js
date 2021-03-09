@@ -20,6 +20,8 @@ const testService = '02fc549a-244c-11eb-adc1-0242ac120002';
 const testCharacteristic = '02fc549a-244c-11eb-adc1-0242ac120002';
 const requiredNumUpdates = 100;
 
+let gattServer = undefined;
+
 /**
  * Load the device code to the Espruino IDE.
  */
@@ -33,6 +35,7 @@ function loadEspruinoDeviceCode() {
 function onGattDisconnected(evt) {
   const device = evt.target;
   logInfo(`Disconnected from GATT on device ${device.name}.`);
+  assertFalse(gattServer.connected, 'Server connected');
 }
 
 async function startTest() {
@@ -41,7 +44,6 @@ async function startTest() {
 
   $('btn_start_test').disabled = true;
   $('btn_load_code').disabled = true;
-  let gattServer = undefined;
   let notifyCharacteristic = undefined;
   let updateNum = 0;
   let lastValue = null;
@@ -66,14 +68,9 @@ async function startTest() {
       return;
     }
     if (lastValue === 9999) {
-      if (value !== 0) {
-        throw `Expected characteristic value 0, actual ${value}.`;
-      }
-      return;
+      assertEquals(0, value);
     }
-    if (value !== (lastValue + 1)) {
-      throw `Expected characteristic value ${lastValue + 1}, actual ${value}.`;
-    }
+    assertEquals(lastValue + 1, value, 'Skipped value');
   }
 
   const onCharacteristicChanged = (evt) => {
@@ -108,12 +105,17 @@ async function startTest() {
     device.addEventListener('gattserverdisconnected', onGattDisconnected);
     logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
     gattServer = await device.gatt.connect();
+    assertEquals(gattServer.device, device, 'Server device mismatch');
+    assertTrue(gattServer.connected, 'server.connected should be true');
 
     logInfo(`Connected to GATT, requesting service: ${testService}...`);
     const service = await gattServer.getPrimaryService(testService);
+    assertEquals(service.device, device, 'service device mismatch');
 
-    logInfo(`Got service, requesting characteristic ${testCharacteristic}...`);
+    logInfo(`Connected to service uuid:${service.uuid}, primary:${service.isPrimary}`);
+    logInfo(`Requesting characteristic ${testCharacteristic}...`);
     const characteristic = await service.getCharacteristic(testCharacteristic);
+    assertEquals(service.device, device, 'Characteristic service mismatch');
 
     logInfo(`Got characteristic, reading value...`);
     let dataView = await characteristic.readValue();

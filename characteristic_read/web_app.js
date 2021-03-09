@@ -21,6 +21,8 @@ const testService = '0b30acec-193e-11eb-adc1-0242ac120002';
 // The test characteristic defined in device_code.js
 const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 
+let gattServer = undefined;
+
 /**
  * Load the device code to the Espruino IDE.
  */
@@ -34,6 +36,7 @@ function loadEspruinoDeviceCode() {
 function onGattDisconnected(evt) {
   const device = evt.target;
   logInfo(`Disconnected from GATT on device ${device.name}.`);
+  assertFalse(gattServer.connected, 'Server connected');
 }
 
 async function startTest() {
@@ -44,7 +47,6 @@ async function startTest() {
 
   $('btn_start_test').disabled = true;
   $('btn_load_code').disabled = true;
-  let gattServer = undefined;
 
   try {
     const options = {
@@ -53,29 +55,30 @@ async function startTest() {
       ],
       optionalServices: [testService]
     };
+    logInfo(`Requesting Bluetooth device with service ${testService}`);
     const device = await navigator.bluetooth.requestDevice(options);
 
     device.addEventListener('gattserverdisconnected', onGattDisconnected);
     logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
     gattServer = await device.gatt.connect();
+    assertEquals(gattServer.device, device, 'Server device mismatch');
+    assertTrue(gattServer.connected, 'server.connected should be true');
 
     logInfo(`Connected to GATT, requesting service: ${testService}...`);
     const service = await gattServer.getPrimaryService(testService);
+    assertEquals(service.device, device, 'service device mismatch');
 
-    logInfo(`Got service, requesting characteristic ${testCharacteristic}...`);
+    logInfo(`Connected to service uuid:${service.uuid}, primary:${service.isPrimary}`);
+    logInfo(`Requesting characteristic ${testCharacteristic}...`);
     const characteristic = await service.getCharacteristic(testCharacteristic);
+    assertEquals(service.device, device, 'Characteristic service mismatch');
 
     logInfo(`Got characteristic, reading value...`);
     const dataview = await characteristic.readValue();
 
     const val = dataview.getUint8(0);
     // The expected value is hard-coded in device_code.js.
-    const expectedValue = 17;
-    if (val == expectedValue) {
-      logInfo(`Got expected characteristic value ${val}.`);
-    } else {
-      logError(`Expected value of ${expectedValue}, but got ${val}.`);
-    }
+    assertEquals(17, val, 'Incorrect value from device');
   } catch (error) {
     logError(`Unexpected failure: ${error}`);
   }
