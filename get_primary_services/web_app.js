@@ -66,20 +66,19 @@ async function startTest() {
     });
   };
 
+  // Espruino does not set extended properties, so reliableWrite and
+  // writableAuxiliaries is always false.
+  const alwaysFalseProperties = ['reliableWrite', 'writableAuxiliaries'];
+
   // Verify the properties of |firstCharacteristicUUID|, which should match
   // those set in device_code.js.
   const verifyFirstCharacteristicProperties = (characteristic) => {
     const trueProps = ['read', 'notify'];
     const falseProps = ['broadcast', 'writeWithoutResponse', 'write',
-      'indicate', 'authenticatedSignedWrites', 'reliableWrite',
-      'writableAuxiliaries'];
+      'indicate', 'authenticatedSignedWrites'].concat(alwaysFalseProperties);
 
     verifyProperties(characteristic, trueProps, falseProps);
   };
-
-  // Espruino does not set extended properties, so reliableWrite and
-  // writableAuxiliaries is always false.
-  const alwaysFalseProperties = ['reliableWrite', 'writableAuxiliaries'];
 
   // Verify the properties of |secondCharacteristicUUID|, which should match
   // those set in device_code.js.
@@ -138,13 +137,25 @@ async function startTest() {
     };
     logInfo(`Requesting Bluetooth device with services ${JSON.stringify(testServiceUUIDs)}`);
     remoteDevice = await navigator.bluetooth.requestDevice(options);
-    logInfo(`Device: ID: ${remoteDevice.id}, name: \"${remoteDevice.name}\"`),
+    logInfo(`Device: ID: ${remoteDevice.id}, name: \"${remoteDevice.name}\"`);
 
-      remoteDevice.addEventListener('gattserverdisconnected', onGattDisconnected);
+    remoteDevice.addEventListener('gattserverdisconnected', onGattDisconnected);
     gattServer = await remoteDevice.gatt.connect();
 
     logInfo(`Connected to GATT, requesting primary services...`);
     const services = await gattServer.getPrimaryServices();
+
+    const expectedServiceIDs = services.map((service) => {
+      return service.uuid;
+    });
+    services.forEach((service) => {
+      if (!expectedServiceIDs.includes(service.uuid)) {
+        throw `Unexpected service ${service.uuid}`;
+      }
+      expectedServiceIDs.splice(expectedServiceIDs.indexOf(service.uuid), 1);
+    });
+    assertEquals(expectedServiceIDs.length, 0,
+      `Expected service(s) not found: ${JSON.stringify(expectedServiceIDs)}`);
 
     var actions = services.map(logService);
     await Promise.all(actions);
