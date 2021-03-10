@@ -66,16 +66,17 @@ async function startTest() {
     });
   };
 
-  // Espruino does not set extended properties, so reliableWrite and
-  // writableAuxiliaries is always false.
-  const alwaysFalseProperties = ['reliableWrite', 'writableAuxiliaries'];
+  // Espruino does not set extended properties, so these properties are always
+  // false.
+  const alwaysFalseProperties = ['reliableWrite', 'writableAuxiliaries',
+    'authenticatedSignedWrites'];
 
   // Verify the properties of |firstCharacteristicUUID|, which should match
   // those set in device_code.js.
   const verifyFirstCharacteristicProperties = (characteristic) => {
     const trueProps = ['read', 'notify'];
     const falseProps = ['broadcast', 'writeWithoutResponse', 'write',
-      'indicate', 'authenticatedSignedWrites'].concat(alwaysFalseProperties);
+      'indicate'].concat(alwaysFalseProperties);
 
     verifyProperties(characteristic, trueProps, falseProps);
   };
@@ -84,16 +85,14 @@ async function startTest() {
   // those set in device_code.js.
   const verifySecondCharacteristicProperties = (characteristic) => {
     const trueProps = ['broadcast', 'write', 'writeWithoutResponse', 'indicate'];
-    const falseProps = ['read', 'notify',
-      'authenticatedSignedWrites'].concat(alwaysFalseProperties);
+    const falseProps = ['read', 'notify'].concat(alwaysFalseProperties);
     verifyProperties(characteristic, trueProps, falseProps);
   };
 
   // Get a string of all properties set to true.
   const getCharacteristicProperties = (properties) => {
     const propNames = ['read', 'notify', 'broadcast', 'writeWithoutResponse',
-      'write', 'indicate',
-      'authenticatedSignedWrites'].concat(alwaysFalseProperties);
+      'write', 'indicate'].concat(alwaysFalseProperties);
 
     let enabledProps = [];
     propNames.forEach(propName => {
@@ -108,24 +107,37 @@ async function startTest() {
   };
 
   const logService = async (service) => {
-    let logText = [
-      ` Service UUID: ${service.uuid}, isPrimary: ${service.isPrimary}`
-    ];
     if (service.device != remoteDevice)
       throw 'Service device does not match connected device';
     const characteristics = await service.getCharacteristics();
     if (!characteristics.length) {
-      logText.push(`  No characteristics`);
-    } else {
-      characteristics.forEach(characteristic => {
-        logText.push(`  Characteristic UUID: ${characteristic.uuid}`);
-        logText.push(`   Props: ${getCharacteristicProperties(characteristic.properties)}`);
+      throw `Service ${service.uuid} had no characteristics`;
+    }
+    let logText = [
+      ` Service UUID: ${service.uuid}, isPrimary: ${service.isPrimary}`
+    ];
+    // Only first service has specific characteristics which are verified.
+    const checkExpectedCharacteristics = service.uuid == '3f2b9742-7dce-11eb-9439-0242ac130002';
+    let expectedCharacteristricIDs = ['3f2b9c10-7dce-11eb-9439-0242ac130002',
+      'dcc030e4-8035-11eb-9439-0242ac130002'];
+    characteristics.forEach(characteristic => {
+      logText.push(`  Characteristic UUID: ${characteristic.uuid}`);
+      logText.push(`   Props: ${getCharacteristicProperties(characteristic.properties)}`);
+      if (checkExpectedCharacteristics) {
+        if (!expectedCharacteristricIDs.includes(characteristic.uuid))
+          throw `Unexpected characteristric: ${characteristic.uuid}`;
+        expectedCharacteristricIDs.splice(
+          expectedCharacteristricIDs.indexOf(characteristic.uuid), 1);
         if (characteristic.uuid == firstCharacteristicUUID) {
           verifyFirstCharacteristicProperties(characteristic);
         } else if (characteristic.uuid == secondCharacteristicUUID) {
           verifySecondCharacteristicProperties(characteristic);
         }
-      });
+      }
+    });
+    if (checkExpectedCharacteristics) {
+      assertEquals(expectedCharacteristricIDs.length, 0,
+        `Missing characteristics: ${JSON.stringify(expectedCharacteristricIDs)}`)
     }
     logText.map(logInfo);
   }
@@ -145,9 +157,8 @@ async function startTest() {
     logInfo(`Connected to GATT, requesting primary services...`);
     const services = await gattServer.getPrimaryServices();
 
-    const expectedServiceIDs = services.map((service) => {
-      return service.uuid;
-    });
+    const expectedServiceIDs = [...testServiceUUIDs].concat(
+      getEspruinoPrimaryService());
     services.forEach((service) => {
       if (!expectedServiceIDs.includes(service.uuid)) {
         throw `Unexpected service ${service.uuid}`;
