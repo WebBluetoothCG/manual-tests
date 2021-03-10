@@ -69,3 +69,13 @@ function testDone() {
     result.classList.add('pass');
   }
 }
+
+function assertEquals(expected, observed, opt_message) {
+  if (observed === expected)
+    return;
+  let message = `Assertion Failed. Observed: ${observed}, Expected: ${expected}`;
+  if (opt_message) {
+    message = message + `, ${opt_message}`;
+  }
+  logError(message);
+}
