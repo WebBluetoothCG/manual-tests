@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2021 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Descriptor Test</title>
+  <script src="../shared/shared.js"></script>
+  <script src="web_app.js"></script>
+  <link rel="stylesheet" href="../css/main.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body onload="init()">
+  <h1>Descriptor Test</h1>
+  <p>Test read from and writing to descriptors.
+  </p>
+  <div id="have_bluetooth" style="visibility: visible;">
+    <h2>Step 1</h2>
+    <div class="container">
+      <div class="flex">
+        <div class="inRow">
+          Press the button to load the code to the Espruino IDE.
+          From there flash any Bluetooth capable Espruino device.
+          <br>
+          <br>
+          View <a href="device_code.js" title="Device source code">source</a>.
+        </div>
+        <div class="inRow">
+          <button id="btn_load_code" type="button" onclick="loadEspruinoDeviceCode()">Load Device Code</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>Step 2</h2>
+    <div>
+      <div class="flex">
+        <div class="inRow">
+          Once running, start the test.
+        </div>
+        <div class="inRow">
+          <button id="btn_start_test" type="button" onclick="startTest()">Start Test</button>
+        </div>
+      </div>
+    </div>
+
+    <p>Status: <span id='test_result'></span></p>
+    <pre id='status'></pre>
+  </div>
+  <!-- Only one of the two below will be visible. -->
+  <div id="no_bluetooth" class="no-bluetooth" style="visibility: hidden;">
+    Bluetooth is not available.
+  </div>
+  <div id="insecure_context" class="no-bluetooth" style="visibility: hidden;">
+    Bluetooth is not available. Bluetooth requires a secure context (HTTPS).
+    For development purposes it does support HTTP, but only the on the loopback
+    adapter (i.e. "localhost").
+  </div>
+</body>
+
+</html>
