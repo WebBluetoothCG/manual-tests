@@ -71,7 +71,7 @@ async function startTest() {
     logInfo(`Connected to service uuid:${service.uuid}, primary:${service.isPrimary}`);
     logInfo(`Requesting characteristic ${testCharacteristic}...`);
     const characteristic = await service.getCharacteristic(testCharacteristic);
-    assertEquals(service.device, device, 'Characteristic service mismatch');
+    assertEquals(service.device, device, 'characteristic service mismatch');
 
     logInfo(`Got characteristic, reading value...`);
     const dataview = await characteristic.readValue();
