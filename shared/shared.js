@@ -70,6 +70,11 @@ function testDone() {
   }
 }
 
+window.onerror = function() {
+  // An uncaught exception. Increment the error count to ensure the test fails.
+  numErrors += 1;
+}
+
 function assertEquals(expected, observed, opt_message) {
   if (observed === expected)
     return;
@@ -77,5 +82,13 @@ function assertEquals(expected, observed, opt_message) {
   if (opt_message) {
     message = message + `, ${opt_message}`;
   }
-  logError(message);
+  throw message;
+}
+
+function assertTrue(observed, opt_message) {
+  assertEquals(true, observed, opt_message);
+}
+
+function assertFalse(observed, opt_message) {
+  assertEquals(false, observed, opt_message);
 }
