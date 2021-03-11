@@ -109,7 +109,7 @@ async function startTest() {
 
     dataview = await characteristic.readValue();
     val = dataview.getUint32(0, /*littleEndian=*/true);
-    assertEquals(fourthValue, val, 'Incorrect second value');
+    assertEquals(fourthValue, val, 'Incorrect fourth value');
 
     logInfo('Test passed.');
   } catch (error) {
