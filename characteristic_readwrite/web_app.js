@@ -50,7 +50,7 @@ async function startTest() {
 
   try {
     const options = {
-      filters: [{services: [nordicUARTService]}],
+      filters: [{ services: [nordicUARTService] }],
       optionalServices: [testService]
     };
     logInfo(`Requesting Bluetooth device with service ${testService}`);
@@ -74,19 +74,42 @@ async function startTest() {
 
     const firstValue = 1999;
     logInfo(`Got characteristic, writing value ${firstValue}...`);
-    await characteristic.writeValueWithResponse(new Uint32Array([firstValue]));
+    let result = await characteristic.writeValueWithResponse(
+      new Uint32Array([firstValue]));
 
     let dataview = await characteristic.readValue();
     let val = dataview.getUint32(0, /*littleEndian=*/true);
     assertEquals(firstValue, val, 'Incorrect first value');
 
     const secondValue = 2012;
-    logInfo(`Got characteristic, writing value ${secondValue}...`);
-    await characteristic.writeValueWithResponse(new Uint32Array([secondValue]));
+    logInfo(`writing value ${secondValue}...`);
+    result = await characteristic.writeValueWithResponse(
+      new Uint32Array([secondValue]));
+    assertEquals(undefined, result);
 
     dataview = await characteristic.readValue();
     val = dataview.getUint32(0, /*littleEndian=*/true);
     assertEquals(secondValue, val, 'Incorrect second value');
+
+    const thirdValue = 2040;
+    logInfo(`writing value ${thirdValue}...`);
+    result = await characteristic.writeValueWithoutResponse(
+      new Uint32Array([thirdValue]));
+    assertEquals(undefined, result);
+
+    dataview = await characteristic.readValue();
+    val = dataview.getUint32(0, /*littleEndian=*/true);
+    assertEquals(thirdValue, val, 'Incorrect third value');
+
+    // writeValue is deprecated.
+    const fourthValue = 3000;
+    logInfo(`writing value ${fourthValue}...`);
+    result = await characteristic.writeValue(new Uint32Array([fourthValue]));
+    assertEquals(undefined, result);
+
+    dataview = await characteristic.readValue();
+    val = dataview.getUint32(0, /*littleEndian=*/true);
+    assertEquals(fourthValue, val, 'Incorrect fourth value');
 
     logInfo('Test passed.');
   } catch (error) {
