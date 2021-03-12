@@ -47,7 +47,7 @@ async function startTest() {
   $('btn_start_test').disabled = true;
   $('btn_load_code').disabled = true;
 
-  // Verify the characteristic descriptors defened in device_code.js
+  // Verify the characteristic descriptors defined in device_code.js
   const verifyTestServiceDescriptors = async (service) => {
     assertEquals(testServiceUUID, service.uuid, 'incorrect service UUID');
 
