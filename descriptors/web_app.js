@@ -71,10 +71,10 @@ async function startTest() {
           let strVal = decoder.decode(value);
           assertEquals('Test UINT32 characteristic', strVal);
 
-          strVal = decoder.decode(value);
+          strVal = decoder.decode(descriptor.value);
           assertEquals('Test UINT32 characteristic', strVal);
 
-          const encoder = new TextEncoder('utf-8')
+          const encoder = new TextEncoder('utf-8');
           try {
             await descriptor.writeValue(encoder.encode('Something else'));
           } catch (e) {
@@ -121,11 +121,30 @@ async function startTest() {
             descriptor.uuid);
           assertEquals(characteristic, descriptor.characteristic,
             'descriptor characteristic mismatch');
-          const value = await descriptor.readValue();
-          const decoder = new TextDecoder('utf-8');
-          const strVal = decoder.decode(value);
-          assertEquals(2, strVal.length);
-          assertEquals('\0\0', strVal);
+
+          // Not currently subscribed to notifications, so expect zero
+          // subscribers to the RX characteristic.
+          let dataView = await descriptor.readValue();
+          let value = new Uint8Array(dataView.buffer);
+          assertEquals(2, value.length);
+          assertEquals(0, value[0]);
+          assertEquals(0, value[1]);
+
+          // Now start notifications and assert that there is one subscriber.
+          let notifyCharacteristic = await characteristic.startNotifications();
+          dataView = await descriptor.readValue();
+          value = new Uint8Array(dataView.buffer);
+          assertEquals(2, value.length);
+          assertEquals(1, value[0]);
+          assertEquals(0, value[1]);
+
+          // Finally stop notifications and assert return to zero.
+          await notifyCharacteristic.stopNotifications();
+          dataView = await descriptor.readValue();
+          value = new Uint8Array(dataView.buffer);
+          assertEquals(2, value.length);
+          assertEquals(0, value[0]);
+          assertEquals(0, value[1]);
           break;
         default:
           logError(`Unexpected characteristic: ${characteristic.uuid}`);
