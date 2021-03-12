@@ -15,11 +15,12 @@
  */
 
 // Espruino devices publish a UART service by default.
-const nordicUARTService = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const nordicUARTServiceUUID = getEspruinoPrimaryService();
 // The test service defined in device_code.js
 const testServiceUUID = '47ffa036-81c8-11eb-8dcd-0242ac130003';
-// The test characteristic defined in device_code.js
-const testCharacteristicUUID = '47ffa252-81c8-11eb-8dcd-0242ac130003';
+// The test characteristics defined in device_code.js
+const characteristicWithDescriptorUUID = '47ffa252-81c8-11eb-8dcd-0242ac130003';
+const characteristicWithoutDescriptorUUID = '4b06add0-8351-11eb-8dcd-0242ac130003';
 
 let gattServer = undefined;
 
@@ -51,11 +52,11 @@ async function startTest() {
     assertEquals(testServiceUUID, service.uuid, 'incorrect service UUID');
 
     const characteristics = await service.getCharacteristics();
-    assertEquals(1, characteristics.length, 'expected 1 characteristic');
+    assertEquals(2, characteristics.length, 'expected 1 characteristic');
     for (characteristic of characteristics) {
       switch (characteristic.uuid) {
-        case testCharacteristicUUID:
-          let descriptors = await characteristic.getDescriptors();
+        case characteristicWithDescriptorUUID:
+          const descriptors = await characteristic.getDescriptors();
           assertEquals(1, descriptors.length);
           const descriptor = await characteristic.getDescriptor(
             BluetoothUUID.getDescriptor('gatt.characteristic_user_description'));
@@ -80,6 +81,14 @@ async function startTest() {
             assertEquals('NotSupportedError', e.name);
           }
           break;
+        case characteristicWithoutDescriptorUUID:
+          try {
+            await characteristic.getDescriptors();
+            logError(`Characteristic ${characteristic.uuid} should have no descriptors`);
+          } catch (e) {
+            assertEquals('NotFoundError', e.name);
+          }
+          break;
         default:
           logError(`Unexpected characteristic: ${characteristic.uuid}`);
       }
@@ -89,7 +98,7 @@ async function startTest() {
   // Verify descriptors for Nordic UART Service (NUS)
   // https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/include/bluetooth/services/nus.html
   const verifyNordicServiceDescriptors = async (service) => {
-    assertEquals(nordicUARTService, service.uuid, 'incorrect service UUID');
+    assertEquals(nordicUARTServiceUUID, service.uuid, 'incorrect service UUID');
 
     const characteristics = await service.getCharacteristics();
     assertEquals(2, characteristics.length, 'expected 2 characteristic');
@@ -126,7 +135,7 @@ async function startTest() {
 
   try {
     const options = {
-      filters: [{ services: [nordicUARTService] }],
+      filters: [{ services: [nordicUARTServiceUUID] }],
       optionalServices: [testServiceUUID]
     };
     logInfo(`Requesting Bluetooth device with service ${testServiceUUID}`);
@@ -139,7 +148,7 @@ async function startTest() {
     assertTrue(gattServer.connected, 'server.connected should be true');
 
     logInfo(`Connected to GATT, requesting primary services...`);
-    let services = await gattServer.getPrimaryServices(nordicUARTService);
+    let services = await gattServer.getPrimaryServices(nordicUARTServiceUUID);
     assertEquals(1, services.length, 'expectged one nordic service');
     await verifyNordicServiceDescriptors(services[0]);
 

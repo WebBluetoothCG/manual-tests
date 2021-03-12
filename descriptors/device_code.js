@@ -49,18 +49,18 @@ function onInit() {
         writable: true,
         notify: false,
         description: 'Test UINT32 characteristic',
-        onWrite: function(evt) {
+        onWrite: function (evt) {
           data[0] = new DataView(evt.data).getUint32(0, /*littleEndian=*/true);
           debug = 'onWrite';
           setTimeout(updateScreen(), 100);
         },
-        onRead: function() {
+        onRead: function () {
           debug = 'onRead';
           return data.buffer;
         },
       },
-      // This characteristic has no description:
-      '47ffa252-81c8-11eb-8dcd-0242ac130003': {
+      // This characteristic has no description (and no descriptors):
+      '4b06add0-8351-11eb-8dcd-0242ac130003': {
         value: data.buffer,
         broadcast: false,
         readable: true,
