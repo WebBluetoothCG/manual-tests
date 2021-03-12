@@ -93,7 +93,7 @@ async function startTest() {
   }
 }
 
-function init() {
+async function init() {
   if (!isBluetoothSupported()) {
     console.log('Bluetooth not supported.');
     $('bluetooth_available').style.display = 'none';
@@ -105,7 +105,7 @@ function init() {
     return;
   }
 
-  const available = navigator.bluetooth.getAvailability();
+  const available = await navigator.bluetooth.getAvailability();
   if (!available) {
     $('bluetooth_available').style.display = 'none';
     $('bluetooth_unavailable').style.visibility = 'visible';
