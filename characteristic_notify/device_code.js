@@ -69,18 +69,18 @@ function onInit() {
     }
   });
 
-  NRF.on('disconnect', (addr) => {
+  NRF.on('disconnect', (reason) => {
     // Provide feedback that device no longer connected.
     digitalWrite(LED, 0);
     isConnected = false;
-    debug = addr;
+    debug = reason;
     updateScreen();
   });
 
-  NRF.on('connect', (reason) => {
+  NRF.on('connect', (addr) => {
     digitalWrite(LED, 1);
     isConnected = true;
-    debug = reason;
+    debug = addr;
     updateScreen();
   });
 
