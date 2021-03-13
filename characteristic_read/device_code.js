@@ -31,12 +31,12 @@ function onInit() {
     }
   });
 
-  NRF.on('disconnect', (addr) => {
+  NRF.on('disconnect', (reason) => {
     // Provide feedback that device no longer connected.
     digitalWrite(LED, 0);
   });
 
-  NRF.on('connect', (reason) => {
+  NRF.on('connect', (addr) => {
     // Provide feedback that device is connected.
     // TODO: Maybe only do this for some devices when external power is
     //       available. For example, this will turn on the backlight on the
