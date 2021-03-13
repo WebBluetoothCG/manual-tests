@@ -64,14 +64,15 @@
   </div>
   <!-- Only one of the three below will be visible. -->
   <div id="bluetooth_none" class="no-bluetooth" style="visibility: hidden;">
-    Bluetooth is not present.
+    Web Bluetooth is not supported by this browser.
   </div>
   <div id="bluetooth_insecure" class="no-bluetooth" style="visibility: hidden;">
     Bluetooth requires a secure context (HTTPS). For development purposes it
     does support HTTP, but only the on the loopback adapter (i.e. "localhost").
   </div>
   <div id="bluetooth_unavailable" class="no-bluetooth" style="visibility: hidden;">
-    Bluetooth is supported, but unavailable.
+    Web Bluetooth is supported by this browser but this device does not have
+    Bluetooth capabilities.
   </div>
 </body>
 
