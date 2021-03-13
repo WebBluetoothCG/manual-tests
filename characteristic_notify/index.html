@@ -30,7 +30,7 @@
   <h1>Bluetooth Characteristic Read w/Notifications</h1>
   <p>This is a simple test to subscribe to characteristic value change notifications.
   </p>
-  <div id="have_bluetooth" style="visibility: visible;">
+  <div id="bluetooth_available" style="visibility: visible;">
     <h2>Step 1</h2>
     <div class="container">
       <div class="flex">
@@ -62,14 +62,17 @@
     <p>Status: <span id='test_result'></span></p>
     <pre id='status'></pre>
   </div>
-  <!-- Only one of the two below will be visible. -->
-  <div id="no_bluetooth" class="no-bluetooth" style="visibility: hidden;">
-    Bluetooth is not available.
+  <!-- Only one of the three below will be visible. -->
+  <div id="bluetooth_none" class="no-bluetooth" style="visibility: hidden;">
+    Web Bluetooth is not supported by this browser.
   </div>
-  <div id="insecure_context" class="no-bluetooth" style="visibility: hidden;">
-    Bluetooth is not available. Bluetooth requires a secure context (HTTPS).
-    For development purposes it does support HTTP, but only the on the loopback
-    adapter (i.e. "localhost").
+  <div id="bluetooth_insecure" class="no-bluetooth" style="visibility: hidden;">
+    Bluetooth requires a secure context (HTTPS). For development purposes it
+    does support HTTP, but only the on the loopback adapter (i.e. "localhost").
+  </div>
+  <div id="bluetooth_unavailable" class="no-bluetooth" style="visibility: hidden;">
+    Web Bluetooth is supported by this browser but this device does not have
+    Bluetooth capabilities.
   </div>
 </body>
 
