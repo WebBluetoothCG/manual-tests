@@ -52,7 +52,7 @@ async function startTest() {
     assertEquals(testServiceUUID, service.uuid, 'incorrect service UUID');
 
     const characteristics = await service.getCharacteristics();
-    assertEquals(2, characteristics.length, 'expected 1 characteristic');
+    assertEquals(2, characteristics.length, 'expected 2 characteristic');
     for (characteristic of characteristics) {
       switch (characteristic.uuid) {
         case characteristicWithDescriptorUUID:
@@ -77,6 +77,7 @@ async function startTest() {
           const encoder = new TextEncoder('utf-8');
           try {
             await descriptor.writeValue(encoder.encode('Something else'));
+            logError('Expected exception');
           } catch (e) {
             assertEquals('NotSupportedError', e.name);
           }
@@ -122,29 +123,25 @@ async function startTest() {
           assertEquals(characteristic, descriptor.characteristic,
             'descriptor characteristic mismatch');
 
-          // Not currently subscribed to notifications, so expect zero
-          // subscribers to the RX characteristic.
+          // Not currently subscribed to notifications, so expect notifications
+          // disabled in the descriptor.
           let dataView = await descriptor.readValue();
-          let value = new Uint8Array(dataView.buffer);
-          assertEquals(2, value.length);
-          assertEquals(0, value[0]);
-          assertEquals(0, value[1]);
+          value = dataView.getUint16(0, /*littleEndian=*/true);
+          // CCCD (Bluetooth 4.2) only uses bottom two bits. We expect to see
+          // LSB zero to signify nontifications disabled.
+          assertEquals(0x0, (value & 0x3));
 
-          // Now start notifications and assert that there is one subscriber.
+          // Now start notifications and assert that notifications bit is set.
           let notifyCharacteristic = await characteristic.startNotifications();
           dataView = await descriptor.readValue();
-          value = new Uint8Array(dataView.buffer);
-          assertEquals(2, value.length);
-          assertEquals(1, value[0]);
-          assertEquals(0, value[1]);
+          value = dataView.getUint16(0, /*littleEndian=*/true);
+          assertEquals(0x1, (value & 0x3));
 
-          // Finally stop notifications and assert return to zero.
+          // Finally stop notifications and assert bit is clear.
           await notifyCharacteristic.stopNotifications();
           dataView = await descriptor.readValue();
-          value = new Uint8Array(dataView.buffer);
-          assertEquals(2, value.length);
-          assertEquals(0, value[0]);
-          assertEquals(0, value[1]);
+          value = dataView.getUint16(0, /*littleEndian=*/true);
+          assertEquals(0x0, (value & 0x3));
           break;
         default:
           logError(`Unexpected characteristic: ${characteristic.uuid}`);
