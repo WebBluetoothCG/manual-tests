@@ -49,7 +49,6 @@ async function startTest() {
   $('btn_load_code').disabled = true;
 
   try {
-
     const testAgeService = async (gettServer) => {
       logInfo(`Requesting age service: ${ageServiceID}...`);
       const service = await gattServer.getPrimaryService(ageServiceID);
