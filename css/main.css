@@ -42,6 +42,10 @@ body {
   padding: 10px;
 }
 
+.inNote {
+  padding: 10px;
+}
+
 .no-bluetooth {
   font-size: larger;
   color: red;
