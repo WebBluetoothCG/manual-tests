@@ -28,10 +28,6 @@ function deviceHasDisplay() {
   return typeof g !== 'undefined';
 }
 
-function deviceHasKeyboard() {
-  return false;
-}
-
 function updateUI() {
   // Provide feedback that device is connected.
   // TODO: Maybe only do this for some devices when external power is

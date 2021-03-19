@@ -17,14 +17,10 @@
 // Espruino devices publish a UART service by default.
 const nordicUARTService = getEspruinoPrimaryService();
 
-const ageServiceNumber = 0x2A80;
 const ageServiceID = '00002a80-0000-1000-8000-00805f9b34fb';
-const ageCharacteristicName = 'age';
 const ageCharacteristicID = '00002a80-0000-1000-8000-00805f9b34fb';
 
-const heartRateServiceName = 'heart_rate';
 const heartRateServiceID = '0000180d-0000-1000-8000-00805f9b34fb';
-const heartRateMaxCharacteristicName = 'heart_rate_max';
 const heartRateMaxCharacteristicID = '00002a8d-0000-1000-8000-00805f9b34fb';
 
 let gattServer = undefined;
@@ -55,16 +51,14 @@ async function startTest() {
   try {
 
     const testAgeService = async (gettServer) => {
-      logInfo(`Requesting age service: 0x${ageServiceNumber.toString(16)}...`);
-      const service = await gattServer.getPrimaryService(
-        BluetoothUUID.canonicalUUID(ageServiceNumber));
+      logInfo(`Requesting age service: ${ageServiceID}...`);
+      const service = await gattServer.getPrimaryService(ageServiceID);
       assertEquals(device, service.device, 'service device mismatch');
       assertEquals(ageServiceID, service.uuid, 'incorrect service UUID');
 
       logInfo(`Connected to service uuid:${service.uuid}, primary:${service.isPrimary}`);
-      logInfo(`Requesting characteristic "${ageCharacteristicName}"...`);
-      const characteristic = await service.getCharacteristic(
-        BluetoothUUID.getCharacteristic(ageCharacteristicName));
+      logInfo(`Requesting characteristic ${ageCharacteristicID}...`);
+      const characteristic = await service.getCharacteristic(ageCharacteristicID);
       assertEquals(characteristic.service, service,
         'characteristic service mismatch');
       assertEquals(ageCharacteristicID, characteristic.uuid,
@@ -92,16 +86,14 @@ async function startTest() {
     }
 
     const testHeartRateService = async (gettServer) => {
-      logInfo(`Requesting service: "${heartRateServiceName}"...`);
-      const service = await gattServer.getPrimaryService(
-        BluetoothUUID.getService(heartRateServiceName));
+      logInfo(`Requesting service: ${heartRateServiceID}...`);
+      const service = await gattServer.getPrimaryService(heartRateServiceID);
       assertEquals(device, service.device, 'service device mismatch');
       assertEquals(heartRateServiceID, service.uuid, 'incorrect service UUID');
 
       logInfo(`Connected to service uuid:${service.uuid}, primary:${service.isPrimary}`);
-      logInfo(`Requesting characteristic "${heartRateMaxCharacteristicName}"...`);
-      const characteristic = await service.getCharacteristic(
-        BluetoothUUID.getCharacteristic(heartRateMaxCharacteristicName));
+      logInfo(`Requesting characteristic ${heartRateMaxCharacteristicID}...`);
+      const characteristic = await service.getCharacteristic(heartRateMaxCharacteristicID);
       assertEquals(characteristic.service, service,
         'characteristic service mismatch');
       assertEquals(heartRateMaxCharacteristicID, characteristic.uuid,
@@ -130,8 +122,8 @@ async function startTest() {
 
     const options = {
       filters: [{ services: [nordicUARTService] }],
-      optionalServices: [ageServiceNumber,
-        BluetoothUUID.getService(heartRateServiceName)]
+      optionalServices: [ageServiceID,
+        BluetoothUUID.getService(heartRateServiceID)]
     };
     logInfo(`Requesting Bluetooth device with service ${nordicUARTService}`);
     const device = await navigator.bluetooth.requestDevice(options);
