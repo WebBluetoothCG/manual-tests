@@ -101,6 +101,10 @@ async function startTest() {
   const verifyNordicServiceDescriptors = async (service) => {
     assertEquals(nordicUARTServiceUUID, service.uuid, 'incorrect service UUID');
 
+    // The CCCD least significant bit indicates notifications enabled/disabled
+    // status.
+    const cccdNotificationsBit = 0x0001;
+
     const characteristics = await service.getCharacteristics();
     assertEquals(2, characteristics.length, 'expected 2 characteristic');
     for (characteristic of characteristics) {
@@ -127,21 +131,23 @@ async function startTest() {
           // disabled in the descriptor.
           let dataView = await descriptor.readValue();
           value = dataView.getUint16(0, /*littleEndian=*/true);
-          // CCCD (Bluetooth 4.2) only uses bottom two bits. We expect to see
-          // LSB zero to signify nontifications disabled.
-          assertEquals(0x0, (value & 0x3));
+          console.log(`Value: ${value}`);
+          assertEquals(0x0, value & cccdNotificationsBit,
+            'notifications disabled (start)');
 
           // Now start notifications and assert that notifications bit is set.
           let notifyCharacteristic = await characteristic.startNotifications();
           dataView = await descriptor.readValue();
           value = dataView.getUint16(0, /*littleEndian=*/true);
-          assertEquals(0x1, (value & 0x3));
+          assertEquals(0x1, value & cccdNotificationsBit,
+            'notifications enabled');
 
           // Finally stop notifications and assert bit is clear.
           await notifyCharacteristic.stopNotifications();
           dataView = await descriptor.readValue();
           value = dataView.getUint16(0, /*littleEndian=*/true);
-          assertEquals(0x0, (value & 0x3));
+          assertEquals(0x0, value & cccdNotificationsBit,
+            'notifications disabled (final)');
           break;
         default:
           logError(`Unexpected characteristic: ${characteristic.uuid}`);
