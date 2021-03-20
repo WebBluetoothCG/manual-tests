@@ -73,6 +73,7 @@ function testDone() {
 window.onerror = function() {
   // An uncaught exception. Increment the error count to ensure the test fails.
   numErrors += 1;
+  testDone();
 }
 
 function assertEquals(expected, observed, opt_message) {
