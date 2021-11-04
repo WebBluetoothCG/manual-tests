@@ -24,6 +24,13 @@ const devicePassKey = '121212'; // 6 digit passkey to use.
 let isConnected = false;
 let debug = '?';
 
+function canShowPasskey() {
+  // Without a display this app cannot actually display a passkey, but return
+  // true because this is required in order to pair using passkeys.
+  // http://forum.espruino.com/comments/14922430/
+  return true;
+}
+
 function deviceHasDisplay() {
   return typeof g !== 'undefined';
 }
@@ -130,9 +137,9 @@ function onInit() {
   });
 
   NRF.setSecurity({
-    display: deviceHasDisplay(),  // Can this device display a passkey?
-    keyboard: false,              // Can this device enter a passkey?
-    mitm: true,                   // Man In The Middle protection.
+    display: canShowPasskey(),  // Can this device display a passkey?
+    keyboard: false,            // Can this device enter a passkey?
+    mitm: true,                 // Man In The Middle protection.
     passkey: devicePassKey,
   });
 
