@@ -196,7 +196,7 @@ function init() {
   if (!isBluetoothSupported()) {
     console.log('Bluetooth not supported.');
     $('have_bluetooth').style.display = 'none';
-    if (window.isSecureContext == 'https') {
+    if (window.isSecureContext) {
       $('no_bluetooth').style.visibility = 'visible';
     } else {
       $('insecure_context').style.visibility = 'visible';
