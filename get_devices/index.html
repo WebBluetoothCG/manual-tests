@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2022 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Persistent Bluetooth permission via getDevices API</title>
+  <script src="../shared/shared.js"></script>
+  <script src="web_app.js"></script>
+  <link rel="stylesheet" href="../css/main.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body onload="init()">
+  <h1>Persistent Bluetooth permission via getDevices API</h1>
+  <p>This is a simple test to check if the bluetooth permission is persistent when using getDevices API.
+  </p>
+  <div id="bluetooth_available" style="visibility: visible;">
+    <h2>Step 1</h2>
+    <div class="container">
+      <div class="flex">
+        <div class="inRow">
+          Press the button to load the code to the Espruino IDE.
+          From there, flash any Bluetooth capable Espruino device.
+          <br>
+          <br>
+          View <a href="device_code.js" title="Device source code">source</a>.
+        </div>
+        <div class="inRow">
+          <button id="btn_load_code" type="button" onclick="loadEspruinoDeviceCode()">Load Device Code</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>Step 2</h2>
+    <div>
+      <div class="flex">
+        <div class="inRow">
+          Before start pairing process, make sure you remove the Bluetooth device form the list of trusted devices of the page by clicking on the lock button next to the URL and clicking the "Reset permission" in the bluetooth section.
+          </br>
+          Once running, start pairing process.
+        </div>
+        <div class="inRow">
+          <button id="btn_start_pairing" type="button" onclick="startPairing()">Start pairing</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>Step 3</h2>
+    <div>
+      <div class="flex">
+        <div class="inRow">
+          Press the button to refresh the page.
+        </div>
+        <div class="inRow">
+          <button id="btn_refresh_page" type="button" onclick="refreshPage()">Refresh page</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>Step 4</h2>
+    <div>
+      <div class="flex">
+        <div class="inRow">
+          Press the button after refresh.
+        </div>
+        <div class="inRow">
+          <button id="btn_check_permission" type="button" onclick="checkPermission()">Check the persistent permission</button>
+        </div>
+      </div>
+    </div>
+
+    <p>Status: <span id='test_result'></span></p>
+    <pre id='status'></pre>
+  </div>
+  <!-- Only one of the three below will be visible. -->
+  <div id="bluetooth_none" class="no-bluetooth" style="visibility: hidden;">
+    Web Bluetooth is not supported by this browser.
+  </div>
+  <div id="bluetooth_insecure" class="no-bluetooth" style="visibility: hidden;">
+    Bluetooth requires a secure context (HTTPS). For development purposes it
+    does support HTTP, but only the on the loopback adapter (i.e. "localhost").
+  </div>
+  <div id="bluetooth_unavailable" class="no-bluetooth" style="visibility: hidden;">
+    Web Bluetooth is supported by this browser but this device does not have
+    Bluetooth capabilities.
+  </div>
+</body>
+
+</html>
