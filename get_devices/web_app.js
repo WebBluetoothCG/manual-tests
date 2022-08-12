@@ -80,7 +80,7 @@ async function startPairing() {
   $('btn_start_pairing').disabled = false;
   $('btn_refresh_page').disabled = false;
   $('btn_check_permission').disabled = false;
-  
+
   if (gattServer) {
     logInfo('Disconnecting from GATT.');
     gattServer.disconnect();
