@@ -80,6 +80,11 @@ async function startPairing() {
   $('btn_start_pairing').disabled = false;
   $('btn_refresh_page').disabled = false;
   $('btn_check_permission').disabled = false;
+  
+  if (gattServer) {
+    logInfo('Disconnecting from GATT.');
+    gattServer.disconnect();
+  }
 }
 
 async function refreshPage() {
@@ -98,7 +103,15 @@ async function checkPermission() {
     passed = pairedDevices[i].name == name;
     logInfo(`Bluetooth Device "${pairedDevices[i].name}" was detected.`);
   }
-  if (!passed) {
+  if (passed) {
+    logInfo(`Requesting Bluetooth device with name "${name}"`);
+    try {
+      const device = await navigator.bluetooth.requestDevice(options);
+      logInfo(`Connected to Bluetooh device with id "${device.id}" and name "${device.name}"`);
+    } catch (error) {
+      logError(`Unexpected failure: ${error}`);
+    }
+  } else {
     logError(`Unexpected failure: The bluetooth device "${name}" doesn't exist on the list of persistant bluetooth devices`);
   }
 
@@ -108,11 +121,6 @@ async function checkPermission() {
   $('btn_start_pairing').disabled = false;
   $('btn_refresh_page').disabled = false;
   $('btn_check_permission').disabled = false;
-
-  if (gattServer) {
-    logInfo('Disconnecting from GATT.');
-    gattServer.disconnect();
-  }
 }
 
 async function init() {
