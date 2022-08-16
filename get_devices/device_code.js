@@ -18,8 +18,6 @@ function onInit() {
   // Put into a known state.
   digitalWrite(LED, 0);
 
-  NRF.setAdvertising({}, {name: "getDevices_test"});
-
   NRF.setServices({
     '0b30acec-193e-11eb-adc1-0242ac120002': {
       '0b30afd0-193e-11eb-adc1-0242ac120002': {

@@ -22,6 +22,8 @@ const testService = '0b30acec-193e-11eb-adc1-0242ac120002';
 const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 
 let gattServer = undefined;
+let btDeviceId = null;
+const btDeviceIdUrlParam = window.location.search.substring(window.location.search.indexOf('bt_device_id=') + 'bt_device_id='.length).split('&')[0];
 
 /**
  * Load the device code to the Espruino IDE.
@@ -43,8 +45,6 @@ async function startPairing() {
   clearStatus();
   logInfo('Starting test');
 
-  logInfo(`Requesting Bluetooth device with service ${testService}`);
-
   $('btn_load_code').disabled = true;
   $('btn_start_pairing').disabled = true;
   $('btn_refresh_page').disabled = true;
@@ -57,9 +57,11 @@ async function startPairing() {
       ],
       optionalServices: [testService]
     };
+
     logInfo(`Requesting Bluetooth device with service ${testService}`);
     const device = await navigator.bluetooth.requestDevice(options);
     logInfo(`Connected to Bluetooh device with id: ${device.id} and name: ${device.name}`);
+    btDeviceId = device.id;
 
     device.addEventListener('gattserverdisconnected', onGattDisconnected);
     logInfo(`Connecting to GATT server for device \"${device.name}\"...`);
@@ -88,31 +90,31 @@ async function startPairing() {
 }
 
 async function refreshPage() {
-  logInfo('Refreshing the page')
-  location.reload();
+  logInfo('Refreshing the page');
+  window.location.replace(`${window.location.href.split("?")[0]}?bt_device_id=${btDeviceId}`);
 }
 
 async function checkPermission() {
   clearStatus();
   logInfo(`Calling getDevices API`);
-  const name = 'getDevices_test';
   const pairedDevices = await navigator.bluetooth.getDevices();
 
+  var gatt;
   var passed = false;
   for (let i = 0; (i < pairedDevices.length) && !passed; i++) {
-    passed = pairedDevices[i].name == name;
-    logInfo(`Bluetooth Device "${pairedDevices[i].name}" was detected.`);
+    logInfo(`Bluetooth Device with name "${pairedDevices[i].name}" and id "${pairedDevices[i].id}" was detected.`);
+    passed = pairedDevices[i].id == btDeviceIdUrlParam;
+    gatt = pairedDevices[i].gatt;
   }
   if (passed) {
-    logInfo(`Requesting Bluetooth device with name "${name}"`);
     try {
-      const device = await navigator.bluetooth.requestDevice(options);
-      logInfo(`Connected to Bluetooh device with id "${device.id}" and name "${device.name}"`);
-    } catch (error) {
+      logInfo(`Connecting to GATT server for device id "${btDeviceIdUrlParam}"...`);
+      gattServer = await gatt.connect();
+    }catch (error) {
       logError(`Unexpected failure: ${error}`);
     }
   } else {
-    logError(`Unexpected failure: The bluetooth device "${name}" doesn't exist on the list of persistant bluetooth devices`);
+    logError(`Unexpected failure: The bluetooth device with id "${btDeviceIdUrlParam}" doesn't exist on the list of persistant bluetooth devices`);
   }
 
   testDone();
@@ -139,5 +141,13 @@ async function init() {
   if (!available) {
     $('bluetooth_available').style.display = 'none';
     $('bluetooth_unavailable').style.visibility = 'visible';
+  }
+
+  if (btDeviceIdUrlParam == null) {
+    $('btn_refresh_page').disabled = true;
+    $('btn_check_permission').disabled = true;
+  }
+  else {
+    logInfo(`bt_device_id "${btDeviceIdUrlParam}" was detected in URL parameters.`);
   }
 }
