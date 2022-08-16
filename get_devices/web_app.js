@@ -23,7 +23,8 @@ const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 
 let gattServer = undefined;
 let btDeviceId = null;
-const btDeviceIdUrlParam = window.location.search.substring(window.location.search.indexOf('bt_device_id=') + 'bt_device_id='.length).split('&')[0];
+const urlParam = 'bt_device_id=';
+const btDeviceIdUrlParam = window.location.search.substring(window.location.search.indexOf(urlParam) + urlParam.length).split('&')[0];
 
 /**
  * Load the device code to the Espruino IDE.
