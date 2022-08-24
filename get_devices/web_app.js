@@ -23,8 +23,8 @@ const testCharacteristic = '0b30afd0-193e-11eb-adc1-0242ac120002';
 
 let gattServer = undefined;
 let btDeviceId = null;
-const urlParam = 'bt_device_id=';
-const btDeviceIdUrlParam = window.location.search.substring(window.location.search.indexOf(urlParam) + urlParam.length).split('&')[0];
+const urlParam = 'bt_device_id';
+const btDeviceIdUrlParam = new URLSearchParams(window.location.search).get(urlParam);
 
 /**
  * Load the device code to the Espruino IDE.
@@ -92,7 +92,9 @@ async function startPairing() {
 
 async function refreshPage() {
   logInfo('Refreshing the page');
-  window.location.replace(`${window.location.href.split("?")[0]}?bt_device_id=${btDeviceId}`);
+  let params = new URLSearchParams();
+  params.set(urlParam, "MhY+FqGfRK7YbVNBsHJHaQ==");
+  window.location.replace(`?${params.toString()}`);
 }
 
 async function checkPermission() {
