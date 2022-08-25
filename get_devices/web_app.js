@@ -90,7 +90,7 @@ async function startPairing() {
 async function refreshPage() {
   logInfo('Refreshing the page');
   let params = new URLSearchParams();
-  params.set(urlParam, "MhY+FqGfRK7YbVNBsHJHaQ==");
+  params.set(urlParam, btDeviceId);
   window.location.replace(`?${params.toString()}`);
 }
 
@@ -121,7 +121,7 @@ async function checkPermission() {
       logInfo(`Requesting characteristic ${testCharacteristic}...`);
       const characteristic = await service.getCharacteristic(testCharacteristic);
       assertEquals(characteristic.service, service, 'characteristic service mismatch');
-    }catch (error) {
+    } catch (error) {
       logError(`Unexpected failure: ${error}`);
     }
   } else {
