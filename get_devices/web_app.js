@@ -119,7 +119,7 @@ async function checkPermission() {
       logInfo(`Requesting characteristic ${testCharacteristic}...`);
       const characteristic = await service.getCharacteristic(testCharacteristic);
       assertEquals(characteristic.service, service, 'characteristic service mismatch');
-    }catch (error) {
+    } catch (error) {
       logError(`Unexpected failure: ${error}`);
     }
   } else {
