@@ -22,7 +22,7 @@ const healthThermometerGattServiceUuid = '00001809-0000-1000-8000-00805f9b34fb';
 
 var device = undefined;
 var intervals = [];
-var previousTimstamp = null;
+var previousTimestamp = null;
 
 function disableButtons(disabled=true) {
   $('btn_load_code').disabled = disabled;
@@ -48,15 +48,15 @@ function checkAdvertisementEvent(event) {
   if (intervals.length < 10) {
     var data = event.serviceData.get(healthThermometerGattServiceUuid).getUint8();
     logInfo(`Advertisement received with data: ${data}`);
-    if (previousTimstamp != null) {
+    if (previousTimestamp != null) {
       if (data != advertisingValue) {
         logError(`Unexpected failure: Value ${data} was received instead of ${advertisingValue}.`);
       }
-      var t = event.timeStamp - previousTimstamp;
+      var t = event.timeStamp - previousTimestamp;
       logInfo(`Interval: ${t}`);
       intervals.push(t);
     }
-    previousTimstamp = event.timeStamp;
+    previousTimestamp = event.timeStamp;
   } else if (intervals.length == 10) {
     var mean = intervals.reduce((a, b) => a + b) / intervals.length;
     logInfo(`Intervals mean: ${mean}`);
@@ -64,7 +64,7 @@ function checkAdvertisementEvent(event) {
       logError(`Unexpected failure: mean of intervals surpassed the limit.`);
     }
     disableButtons(false);
-    intervals.push(event.timeStamp - previousTimstamp);
+    intervals.push(event.timeStamp - previousTimestamp);
   }
 }
 
