@@ -30,10 +30,6 @@ function disableButtons(disabled=true) {
   $('btn_watch_advertisements_no_adv').disabled = disabled;
 }
 
-function onGattDisconnected(evt) {
-  logInfo(`Disconnected from GATT on device ${evt.target.name}.`);
-}
-
 /**
  * Load the device code to the Espruino IDE.
  */
@@ -80,8 +76,6 @@ async function watchAdvertisements() {
       ]
     });
     logInfo(`Requested Bluetooh device with id: ${device.id} and name: ${device.name}`);
-
-    device.addEventListener('gattserverdisconnected', onGattDisconnected);
   } catch (error) {
     logError(`Unexpected failure: ${error}`);
   }
