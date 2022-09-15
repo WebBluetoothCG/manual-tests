@@ -14,6 +14,8 @@
  *  limitations under the License.
  */
 
+const bodyTemperatureAdvertisingUuid = 0x1809;
+
 const advertisingValue = 99;
 const interval = 1000; //ms
 
@@ -22,16 +24,7 @@ function onInit() {
   digitalWrite(LED, 0);
 
   NRF.setServices({
-    '00001809-0000-1000-8000-00805f9b34fb': {
-      '0b301809-193e-11eb-adc1-0242ac120002': {
-        value: [17],
-        broadcast: false,
-        readable: true,
-        writable: false,
-        notify: false,
-        description: 'Single read-only characteristic',
-      }
-    }
+    '00001809-0000-1000-8000-00805f9b34fb': {}
   });
 
   NRF.on('disconnect', (reason) => {
@@ -49,7 +42,7 @@ function onInit() {
   });
 
   NRF.setAdvertising({
-    0x1809: [advertisingValue]},
+    bodyTemperatureAdvertisingUuid: [advertisingValue]},
     {interval: interval}
   );
 }

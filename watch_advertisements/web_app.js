@@ -17,15 +17,10 @@
 // Espruino devices publish a UART service by default.
 const nordicUARTService = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 const bodyTemperatureService = '00001809-0000-1000-8000-00805f9b34fb';
-const testCharacteristic = '0b301809-193e-11eb-adc1-0242ac120002';
 
-let gattServer = undefined;
 let device = undefined;
-let btDeviceId = null;
 let intervals = [];
-let previous_timstamp = null;
-const urlParam = 'bt_device_id';
-const btDeviceIdUrlParam = new URLSearchParams(window.location.search).get(urlParam);
+let previousTimstamp = null;
 
 function disableButtons(disabled=true) {
   $('btn_load_code').disabled = disabled;
@@ -35,7 +30,6 @@ function disableButtons(disabled=true) {
 
 function onGattDisconnected(evt) {
   logInfo(`Disconnected from GATT on device ${evt.target.name}.`);
-  assertFalse(gattServer.connected, 'Server connected');
 }
 
 /**
@@ -48,19 +42,19 @@ function loadEspruinoDeviceCode() {
   });
 }
 
-function listenToAdvertisements(event) {
+function checkAdvertisementEvent(event) {
   if (intervals.length < 10) {
     var data = event.serviceData.get(bodyTemperatureService).getUint8();
     logInfo(`Advertisement received with data: ${data}`);
-    if (previous_timstamp != null) {
+    if (previousTimstamp != null) {
       if (data != advertisingValue) {
         logError(`Unexpected failure: Value ${data} was received instead of ${advertisingValue}.`);
       }
-      t = event.timeStamp - previous_timstamp;
+      t = event.timeStamp - previousTimstamp;
       logInfo(`Interval: ${t}`);
       intervals.push(t);
     }
-    previous_timstamp = event.timeStamp;
+    previousTimstamp = event.timeStamp;
   } else if (intervals.length == 10) {
     mean = intervals.reduce((a, b) => a + b) / intervals.length;
     logInfo(`Intervals mean: ${mean}`);
@@ -68,7 +62,7 @@ function listenToAdvertisements(event) {
       logError(`Unexpected failure: mean of intervals surpassed the limit.`);
     }
     disableButtons(false);
-    intervals.push(event.timeStamp - previous_timstamp);
+    intervals.push(event.timeStamp - previousTimstamp);
   }
 }
 
@@ -85,15 +79,13 @@ async function watchAdvertisements() {
       optionalServices: [bodyTemperatureService]
     });
     logInfo(`Requested Bluetooh device with id: ${device.id} and name: ${device.name}`);
-    btDeviceId = device.id;
 
     device.addEventListener('gattserverdisconnected', onGattDisconnected);
   } catch (error) {
     logError(`Unexpected failure: ${error}`);
   }
 
-  disableButtons();
-  device.addEventListener('advertisementreceived', listenToAdvertisements);
+  device.addEventListener('advertisementreceived', checkAdvertisementEvent);
   device.watchAdvertisements();
 }
 
@@ -101,15 +93,15 @@ async function watchAdvertisements_NoDeviceAdvertising() {
   logInfo('Starting test');
   clearStatus();
   disableButtons();
-  device.removeEventListener('advertisementreceived', listenToAdvertisements);
-  function listenToAdvertisements2(event) {
+  device.removeEventListener('advertisementreceived', checkAdvertisementEvent);
+  function checkAdvertisementEvent2(event) {
     logError(`Unexpected failure: Shouldn't have received advertisements.`);
   }
-  device.addEventListener('advertisementreceived', listenToAdvertisements2);
+  device.addEventListener('advertisementreceived', checkAdvertisementEvent2);
 
   setTimeout(function() {
     testDone();
-    device.removeEventListener('advertisementreceived', listenToAdvertisements2);
+    device.removeEventListener('advertisementreceived', checkAdvertisementEvent2);
     disableButtons(false);
   }, 10 * interval);
 }
@@ -130,12 +122,5 @@ async function init() {
   if (!available) {
     $('bluetooth_available').style.display = 'none';
     $('bluetooth_unavailable').style.visibility = 'visible';
-  }
-
-  if (btDeviceIdUrlParam == null) {
-    $('btn_watch_advertisements_no_adv').disabled = true;
-  }
-  else {
-    logInfo(`bt_device_id "${btDeviceIdUrlParam}" was detected in URL parameters.`);
   }
 }
