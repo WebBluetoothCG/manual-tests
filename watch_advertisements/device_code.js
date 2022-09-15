@@ -14,6 +14,8 @@
  *  limitations under the License.
  */
 
+const bodyTemperatureAdvertisingUuid = 0x1809;
+
 const advertisingValue = 99;
 const interval = 1000; //ms
 
