@@ -112,7 +112,6 @@ async function watchAdvertisements_NoDeviceAdvertising() {
     device.removeEventListener('advertisementreceived', listenToAdvertisements2);
     disableButtons(false);
   }, 10 * interval);
-  
 }
 
 async function init() {
