@@ -14,18 +14,12 @@
  *  limitations under the License.
  */
 
-const bodyTemperatureAdvertisingUuid = 0x1809;
-
 const advertisingValue = 99;
 const interval = 1000; //ms
 
 function onInit() {
   // Put into a known state.
   digitalWrite(LED, 0);
-
-  NRF.setServices({
-    '00001809-0000-1000-8000-00805f9b34fb': {}
-  });
 
   NRF.on('disconnect', (reason) => {
     // Provide feedback that device is no longer connected.
@@ -42,7 +36,7 @@ function onInit() {
   });
 
   NRF.setAdvertising({
-    bodyTemperatureAdvertisingUuid: [advertisingValue]},
+    0x1809: [advertisingValue]}, // 0x1809 = health thermometer GATT service 16-bit UUID
     {interval: interval}
   );
 }

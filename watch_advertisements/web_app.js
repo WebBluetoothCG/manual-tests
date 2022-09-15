@@ -14,13 +14,15 @@
  *  limitations under the License.
  */
 
+"use strict";
+
 // Espruino devices publish a UART service by default.
 const nordicUARTService = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-const bodyTemperatureService = '00001809-0000-1000-8000-00805f9b34fb';
+const healthThermometerGattServiceUuid = '00001809-0000-1000-8000-00805f9b34fb';
 
-let device = undefined;
-let intervals = [];
-let previousTimstamp = null;
+var device = undefined;
+var intervals = [];
+var previousTimstamp = null;
 
 function disableButtons(disabled=true) {
   $('btn_load_code').disabled = disabled;
@@ -37,26 +39,26 @@ function onGattDisconnected(evt) {
  */
 function loadEspruinoDeviceCode() {
   fetch('device_code.js').then(response => response.text()).then(data => {
-    let url = 'http://www.espruino.com/webide?code=' + encodeURIComponent(data);
+    var url = 'http://www.espruino.com/webide?code=' + encodeURIComponent(data);
     window.open(url, '_window');
   });
 }
 
 function checkAdvertisementEvent(event) {
   if (intervals.length < 10) {
-    var data = event.serviceData.get(bodyTemperatureService).getUint8();
+    var data = event.serviceData.get(healthThermometerGattServiceUuid).getUint8();
     logInfo(`Advertisement received with data: ${data}`);
     if (previousTimstamp != null) {
       if (data != advertisingValue) {
         logError(`Unexpected failure: Value ${data} was received instead of ${advertisingValue}.`);
       }
-      t = event.timeStamp - previousTimstamp;
+      var t = event.timeStamp - previousTimstamp;
       logInfo(`Interval: ${t}`);
       intervals.push(t);
     }
     previousTimstamp = event.timeStamp;
   } else if (intervals.length == 10) {
-    mean = intervals.reduce((a, b) => a + b) / intervals.length;
+    var mean = intervals.reduce((a, b) => a + b) / intervals.length;
     logInfo(`Intervals mean: ${mean}`);
     if (mean > 3 * interval) {
       logError(`Unexpected failure: mean of intervals surpassed the limit.`);
@@ -75,8 +77,7 @@ async function watchAdvertisements() {
     device = await navigator.bluetooth.requestDevice({
       filters: [
         { services: [nordicUARTService] }
-      ],
-      optionalServices: [bodyTemperatureService]
+      ]
     });
     logInfo(`Requested Bluetooh device with id: ${device.id} and name: ${device.name}`);
 
