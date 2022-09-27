@@ -14,26 +14,25 @@
  *  limitations under the License.
  */
 
- function onInit() {
-    // Put into a known state.
+function onInit() {
+  // Put into a known state.
+  digitalWrite(LED, 0);
+
+  NRF.setServices({
+    '0b30acec-193e-11eb-adc1-0242ac120002': {}
+  });
+
+  NRF.on('disconnect', (reason) => {
+    // Provide feedback that device is no longer connected.
     digitalWrite(LED, 0);
-  
-    NRF.setServices({
-      '0b30acec-193e-11eb-adc1-0242ac120002': {}
-    });
-  
-    NRF.on('disconnect', (reason) => {
-      // Provide feedback that device is no longer connected.
-      digitalWrite(LED, 0);
-    });
-  
-    NRF.on('connect', (addr) => {
-      // Provide feedback that device is connected.
-      // TODO: Maybe only do this for some devices when external power is
-      //       available. For example, this will turn on the backlight on the
-      //       Pixl.js screen, which might not be desirable when powered by the
-      //       CR2032 coin cell battery.
-      digitalWrite(LED, 1);
-    });
-  }
-  
+  });
+
+  NRF.on('connect', (addr) => {
+    // Provide feedback that device is connected.
+    // TODO: Maybe only do this for some devices when external power is
+    //       available. For example, this will turn on the backlight on the
+    //       Pixl.js screen, which might not be desirable when powered by the
+    //       CR2032 coin cell battery.
+    digitalWrite(LED, 1);
+  });
+}
