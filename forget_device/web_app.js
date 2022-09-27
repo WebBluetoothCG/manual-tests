@@ -81,7 +81,7 @@ async function startPairing() {
 async function forgetDevice() {
   clearStatus();
   logInfo(`Calling forget API`);
-  var device = await getPairedDeviceWithId(btDeviceId);
+  const device = await getPairedDeviceWithId(btDeviceId);
 
   if (device) {
     try {
