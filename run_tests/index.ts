@@ -1,11 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 
-const pathFromDirent = (dir: fs.Dirent): string =>
-  path.join(dir.path, dir.name);
+const exampleFoldersDir = path.parse(__dirname).dir;
 
-const run = () => {
-  const directoryPath = path.parse(__dirname).dir;
+const pathFromDirent = (dir: fs.Dirent): string => {
+  return path.join(dir.path, dir.name);
+};
+
+const getExampleDirectories = (
+  directoryPath: string,
+): ReadonlyArray<string> => {
   const exampleFolders = fs
     .readdirSync(directoryPath, {
       withFileTypes: true,
@@ -17,8 +21,14 @@ const run = () => {
           return file === "index.html";
         })
       );
-    });
-  console.log(exampleFolders);
+    })
+    .map((f) => pathFromDirent(f));
+  return exampleFolders;
+};
+
+const run = () => {
+  const exDirs = getExampleDirectories(exampleFoldersDir);
+  console.log(exDirs);
 };
 
 run();
