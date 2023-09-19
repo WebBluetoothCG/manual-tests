@@ -6,3 +6,6 @@
 
 # Mac Files
 .DS_Store
+
+# Node dependencies
+node_modules
