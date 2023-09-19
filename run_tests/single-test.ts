@@ -1,12 +1,13 @@
 import t from "tap";
+import { BrowserDriver } from "./driver";
 
-export const runSingleTest = (name: string) => {
+export const runSingleTest = (name: string, browserDriver: BrowserDriver) => {
   t.test(name, (t) => {
     t.before(() => {
-      console.log("individual test setup goes here");
+      browserDriver.createSession();
     });
     t.after(() => {
-      console.log("individual test teardown goes here");
+      browserDriver.endSession();
     });
 
     t.pass("this passes");

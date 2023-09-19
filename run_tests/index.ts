@@ -2,8 +2,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { tap } from "@tapjs/core";
 import { runSingleTest } from "./single-test";
+import { BrowserDriver, BrowserNames, getBrowserDriver } from "./driver";
 
 const exampleFoldersDir = path.parse(__dirname).dir;
+// TODO: hook up to CLI arg / ENV
+const browser = BrowserNames.CHROME;
 
 const pathFromDirent = (dir: fs.Dirent): string => {
   return path.join(dir.path, dir.name);
@@ -28,23 +31,27 @@ const getExampleDirectories = (
   return exampleFolders;
 };
 
-const runTestSuite = (dirs: ReadonlyArray<string>) => {
+const runTestSuite = (
+  dirs: ReadonlyArray<string>,
+  browserDriver: BrowserDriver,
+) => {
   const t = tap();
   t.jobs = 1;
   t.before(() => {
-    console.log("test suite setup goes here");
+    browserDriver.initialize();
   });
   t.after(() => {
-    console.log("test suite teardown goes here");
+    browserDriver.shutdown();
   });
   for (let d of dirs) {
-    runSingleTest(path.basename(d));
+    runSingleTest(path.basename(d), browserDriver);
   }
 };
 
 const run = () => {
   const exDirs = getExampleDirectories(exampleFoldersDir);
-  runTestSuite(exDirs);
+  const browserDriver = getBrowserDriver(browser);
+  runTestSuite(exDirs, browserDriver);
 };
 
 run();
