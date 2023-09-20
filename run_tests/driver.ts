@@ -9,7 +9,7 @@ export const enum BrowserNames {
 export type BrowserDriver = {
   name: BrowserNames;
   initialize: () => void;
-  createSession: () => void;
+  createSession: (url: string) => void;
   uploadDeviceCode: () => void;
   endSession: () => void;
   shutdown: () => void;

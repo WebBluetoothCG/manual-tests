@@ -1,20 +1,33 @@
+import puppeteer, { Browser, Page } from "puppeteer";
 import { BrowserDriver, BrowserNames } from "../driver";
+import assert from "assert";
+
+let browser: Browser | null;
+let page: Page | null;
+
+const assertBrowser = (browser: Browser | null): Browser => {
+  assert(browser, "Browser not launched in time");
+  return browser;
+};
+const assertPage = (page: Page | null): Page => {
+  assert(page, "Page not opened in time");
+  return page;
+};
 
 export const chromeDriver: BrowserDriver = {
   name: BrowserNames.CHROME,
-  initialize: () => {
-    console.log("chrome driver initialize");
+  initialize: async () => {
+    browser = await puppeteer.launch();
   },
-  createSession: () => {
-    console.log("chrome driver createSession");
+  createSession: async (pageUrl: string) => {
+    page = await assertBrowser(browser).newPage();
+    await page.goto(`file:///${pageUrl}`);
   },
-  uploadDeviceCode: () => {
-    console.log("chrome driver uploadDeviceCode");
+  uploadDeviceCode: () => {},
+  endSession: async () => {
+    await assertPage(page).close();
   },
-  endSession: () => {
-    console.log("chrome driver endSession");
-  },
-  shutdown: () => {
-    console.log("chrome driver shutdown");
+  shutdown: async () => {
+    await assertBrowser(browser).close();
   },
 };

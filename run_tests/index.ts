@@ -37,14 +37,14 @@ const runTestSuite = (
 ) => {
   const t = tap();
   t.jobs = 1;
-  t.before(() => {
-    browserDriver.initialize();
+  t.before(async () => {
+    await browserDriver.initialize();
   });
-  t.after(() => {
-    browserDriver.shutdown();
+  t.after(async () => {
+    await browserDriver.shutdown();
   });
   for (let d of dirs) {
-    runSingleTest(path.basename(d), browserDriver);
+    runSingleTest(d, browserDriver);
   }
 };
 
