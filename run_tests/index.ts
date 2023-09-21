@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { tap } from "@tapjs/core";
-import { runServer } from "./server";
+import { runServer, stopServer } from "./server";
 import { runSingleTest } from "./single-test";
 import { BrowserDriver, BrowserNames, getBrowserDriver } from "./driver";
 
@@ -44,6 +44,7 @@ const runTestSuite = (
   });
   t.after(async () => {
     await browserDriver.shutdown();
+    stopServer();
   });
   for (let d of dirs) {
     runSingleTest(d, browserDriver);
