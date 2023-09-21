@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { tap } from "@tapjs/core";
+import { runServer } from "./server";
 import { runSingleTest } from "./single-test";
 import { BrowserDriver, BrowserNames, getBrowserDriver } from "./driver";
 
@@ -27,7 +28,7 @@ const getExampleDirectories = (
         })
       );
     })
-    .map((f) => pathFromDirent(f));
+    .map((f) => path.relative(exampleFoldersDir, pathFromDirent(f)));
   return exampleFolders;
 };
 
@@ -52,6 +53,7 @@ const runTestSuite = (
 const run = () => {
   const exDirs = getExampleDirectories(exampleFoldersDir);
   const browserDriver = getBrowserDriver(browser);
+  runServer(exampleFoldersDir);
   runTestSuite(exDirs, browserDriver);
 };
 
