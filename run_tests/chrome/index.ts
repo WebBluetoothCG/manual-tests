@@ -21,7 +21,7 @@ export const chromeDriver: BrowserDriver = {
   },
   createSession: async (pageUrl: string) => {
     page = await assertBrowser(browser).newPage();
-    await page.goto(`file:///${pageUrl}`);
+    await page.goto(pageUrl);
   },
   uploadDeviceCode: () => {},
   endSession: async () => {
