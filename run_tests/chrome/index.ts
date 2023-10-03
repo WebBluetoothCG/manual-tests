@@ -14,6 +14,31 @@ const assertPage = (page: Page | null): Page => {
   return page;
 };
 
+const operateEspruinoPage = async (page: Page) => {
+  // dismiss "welcome" modal
+  await page.locator("#guiders_overlay").click();
+  // have to wait ~250ms for the overlay to transition out 😞
+  await new Promise((res) => setTimeout(res, 250));
+  // click connect icon in top left
+  await page.locator("#icon-connection").click();
+  //
+  //
+  // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
+  // >>>>>>>
+  // click "Web Bluetooth" button in modal
+  const [devicePrompt] = await Promise.all([
+    page.waitForDevicePrompt(),
+    page.locator('#portselector a[title="Web Bluetooth"]').click(),
+  ]);
+  // >>>>>>>
+  //
+  //
+  console.log(devicePrompt);
+  devicePrompt.select(
+    await devicePrompt.waitForDevice(({ name }) => name.match(/puck/) !== null),
+  );
+};
+
 export const chromeDriver: BrowserDriver = {
   name: BrowserNames.CHROME,
   initialize: async () => {
@@ -36,7 +61,7 @@ export const chromeDriver: BrowserDriver = {
       throw "couldn't find loaded espruino page";
     }
     await espruinoPage.bringToFront();
-    // bluetooth stuff
+    await operateEspruinoPage(espruinoPage);
   },
   endSession: async () => {
     const openPages = await assertBrowser(browser).pages();
