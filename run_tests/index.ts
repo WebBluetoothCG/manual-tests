@@ -37,7 +37,7 @@ const runTestSuite = (
   browserDriver: BrowserDriver,
 ) => {
   const t = tap();
-  t.plan(dirs.length, "All examples did not complete");
+  t.plan(dirs.length);
   t.jobs = 1;
   t.before(async () => {
     await browserDriver.initialize();
