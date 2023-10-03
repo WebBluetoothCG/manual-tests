@@ -17,7 +17,9 @@ const assertPage = (page: Page | null): Page => {
 export const chromeDriver: BrowserDriver = {
   name: BrowserNames.CHROME,
   initialize: async () => {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({
+      headless: false,
+    });
   },
   createSession: async (pageUrl: string) => {
     mainPage = await assertBrowser(browser).newPage();
