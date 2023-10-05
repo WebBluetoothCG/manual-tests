@@ -42,6 +42,9 @@ const runTestSuite = (
   t.before(async () => {
     await browserDriver.initialize();
   });
+  t.afterEach(async function () {
+    await browserDriver.endSession();
+  });
   t.after(async () => {
     await browserDriver.shutdown();
     stopServer();

@@ -63,6 +63,21 @@ export const chromeDriver: BrowserDriver = {
     await espruinoPage.bringToFront();
     await operateEspruinoPage(espruinoPage);
   },
+  runInBrowserTest: async () => {
+    const page = assertPage(mainPage);
+    await page.bringToFront();
+    await page.locator("#btn_start_test").click();
+    // wait for result area to say PASS (or FAIL)
+    await page.waitForFunction(
+      `document.querySelector("#test_result").innerText.length > 0`,
+    );
+    // grab test output in page
+    const result = await Promise.all([
+      await page.$eval("#test_result", (el): string => el.innerText),
+      await page.$eval("#status", (el): string => el.innerText),
+    ]);
+    return { result: result[0], logs: result[1] };
+  },
   endSession: async () => {
     const openPages = await assertBrowser(browser).pages();
     await openPages.map((p) => p.close());
