@@ -66,7 +66,13 @@ export const chromeDriver: BrowserDriver = {
   runInBrowserTest: async () => {
     const page = assertPage(mainPage);
     await page.bringToFront();
-    await page.locator("#btn_start_test").click();
+    // this button is actually not present on more involved tests
+    // so we don't wait long for it to appear and then we move on
+    const startButton = await page.waitForSelector("#btn_start_test", {
+      timeout: 500,
+    });
+    if (!startButton) throw "no start test button found";
+    startButton.click();
     // wait for result area to say PASS (or FAIL)
     await page.waitForFunction(
       `document.querySelector("#test_result").innerText.length > 0`,
