@@ -17,10 +17,18 @@ const assertPage = (page: Page | null): Page => {
 const operateEspruinoPage = async (page: Page) => {
   // dismiss "welcome" modal
   await page.locator("#guiders_overlay").click();
-  // have to wait ~250ms for the overlay to transition out 😞
-  await new Promise((res) => setTimeout(res, 250));
+  // have to wait for the overlay to transition out 😞
+  await Promise.race([
+    // should work based on page css
+    page.waitForSelector(`#guiders_overlay[style*="display: none;"]`),
+    // but in case not this might catch it
+    new Promise((res) => setTimeout(res, 500)),
+  ]);
   // click connect icon in top left
   await page.locator("#icon-connection").click();
+  // click bluetooth button
+  await page.locator('#portselector a[title="Web Bluetooth"]').click();
+  return;
   //
   //
   // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
