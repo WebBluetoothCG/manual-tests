@@ -26,16 +26,16 @@ const operateEspruinoPage = async (page: Page) => {
   // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
   // >>>>>>>
   // click "Web Bluetooth" button in modal
-  const [devicePrompt] = await Promise.all([
-    page.waitForDevicePrompt(),
-    page.locator('#portselector a[title="Web Bluetooth"]').click(),
-  ]);
+  // const [devicePrompt] = await Promise.all([
+  //   page.waitForDevicePrompt(),
+  //   page.locator('#portselector a[title="Web Bluetooth"]').click(),
+  // ]);
+  // devicePrompt.select(
+  //   await devicePrompt.waitForDevice(({ name }) => name.match(/puck/) !== null),
+  // );
   // >>>>>>>
   //
   //
-  console.log(devicePrompt);
-  devicePrompt.select(
-    await devicePrompt.waitForDevice(({ name }) => name.match(/puck/) !== null),
   );
 };
 

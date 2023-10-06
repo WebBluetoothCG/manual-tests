@@ -12,7 +12,7 @@ export const runSingleTest = (
     await browserDriver.createSession(
       path.join(serverBaseUrl, testPath, "index.html"),
     );
-    // await browserDriver.uploadDeviceCode();
+    await browserDriver.uploadDeviceCode();
     const output = await browserDriver.runInBrowserTest();
     t.debug(output.logs);
     t.equal(output.result, "PASS");
