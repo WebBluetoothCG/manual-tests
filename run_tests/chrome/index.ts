@@ -15,7 +15,6 @@ const assertPage = (page: Page | null): Page => {
   return page;
 };
 
-// @ts-ignore unused variable until we fix crash below
 const operateEspruinoPage = async (page: Page, deviceName: string) => {
   // dismiss "welcome" modal
   await page.locator("#guiders_overlay").click();
@@ -30,11 +29,10 @@ const operateEspruinoPage = async (page: Page, deviceName: string) => {
   await page.locator("#icon-connection").click();
   // click bluetooth button
   await page.locator('#portselector a[title="Web Bluetooth"]').click();
-  return;
   //
   //
   // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
-  // >>>>>>>
+  // -----------------------------------
   // click "Web Bluetooth" button in modal
   // const [devicePrompt] = await Promise.all([
   //   page.waitForDevicePrompt(),
@@ -43,9 +41,19 @@ const operateEspruinoPage = async (page: Page, deviceName: string) => {
   // devicePrompt.select(
   //   await devicePrompt.waitForDevice(({ name }) => name.match(/puck/) !== null),
   // );
-  // >>>>>>>
+  // -----------------------------------
   //
   //
+  const device = await page.evaluate(() => {
+    return new Promise((res) => {
+      navigator.bluetooth
+        .requestDevice({
+          filters: [{ name: deviceName }],
+        })
+        .then(res);
+    });
+  });
+  console.log(device);
 };
 
 export const chromeDriver: BrowserDriver = {
@@ -88,8 +96,14 @@ export const chromeDriver: BrowserDriver = {
     );
     // grab test output in page
     const result = await Promise.all([
-      await page.$eval("#test_result", (el): string => el.innerText),
-      await page.$eval("#status", (el): string => el.innerText),
+      await page.$eval(
+        "#test_result",
+        (el): string => (el as HTMLElement).innerText,
+      ),
+      await page.$eval(
+        "#status",
+        (el): string => (el as HTMLElement).innerText,
+      ),
     ]);
     return { result: result[0], logs: result[1] };
   },
