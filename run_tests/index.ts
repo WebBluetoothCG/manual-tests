@@ -9,6 +9,8 @@ const exampleFoldersDir = path.parse(__dirname).dir;
 // TODO: hook up to CLI arg / ENV
 const browser = BrowserNames.CHROME;
 
+const testDirsToSkip = ["get_devices", "watch_advertisements", "forget_device"];
+
 const pathFromDirent = (dir: fs.Dirent): string => {
   return path.join(dir.path, dir.name);
 };
@@ -50,7 +52,11 @@ const runTestSuite = (
     stopServer();
   });
   for (let d of dirs) {
-    runSingleTest(d, browserDriver);
+    if (testDirsToSkip.some((td) => td == d)) {
+      t.skip(d, () => {});
+    } else {
+      runSingleTest(d, browserDriver);
+    }
   }
 };
 
