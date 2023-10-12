@@ -44,7 +44,9 @@ const operateEspruinoPage = async (page: Page, deviceName: string) => {
   // -----------------------------------
   //
   //
-  const device = await page.evaluate(() => {
+
+  // JS version
+  const device = await page.evaluate((deviceName) => {
     return new Promise((res) => {
       navigator.bluetooth
         .requestDevice({
@@ -52,8 +54,18 @@ const operateEspruinoPage = async (page: Page, deviceName: string) => {
         })
         .then(res);
     });
-  });
+  }, deviceName);
   console.log(device);
+  // wait for connection to finish
+  await page.waitForSelector("#icon-deploy");
+  // click deploy button
+  await page.locator("#icon-deploy").click();
+  // wait for status to say 'done'
+  await page.waitForFunction(
+    () =>
+      (document.querySelector(".status__message") as HTMLElement)?.innerText ==
+      "READY",
+  );
 };
 
 export const chromeDriver: BrowserDriver = {
