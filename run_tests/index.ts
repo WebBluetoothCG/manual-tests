@@ -1,15 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import { tap } from "@tapjs/core";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import { BrowserNames, exampleFoldersDir, testDirsToSkip } from "./const";
 import { runServer, stopServer } from "./server";
 import { runSingleTest } from "./single-test";
-import { BrowserDriver, BrowserNames, getBrowserDriver } from "./driver";
-
-const exampleFoldersDir = path.parse(__dirname).dir;
-// TODO: hook up to CLI arg / ENV
-const browser = BrowserNames.CHROME;
-
-const testDirsToSkip = ["get_devices", "watch_advertisements", "forget_device"];
+import { BrowserDriver, getBrowserDriver } from "./driver";
 
 const pathFromDirent = (dir: fs.Dirent): string => {
   return path.join(dir.path, dir.name);
@@ -37,6 +34,7 @@ const getExampleDirectories = (
 const runTestSuite = (
   dirs: ReadonlyArray<string>,
   browserDriver: BrowserDriver,
+  deviceName: string,
 ) => {
   const t = tap();
   t.plan(dirs.length);
@@ -44,7 +42,7 @@ const runTestSuite = (
   t.before(async () => {
     await browserDriver.initialize();
   });
-  t.afterEach(async function () {
+  t.afterEach(async () => {
     await browserDriver.endSession();
   });
   t.after(async () => {
@@ -55,16 +53,35 @@ const runTestSuite = (
     if (testDirsToSkip.some((td) => td == d)) {
       t.skip(d, () => {});
     } else {
-      runSingleTest(d, browserDriver);
+      runSingleTest(d, browserDriver, deviceName);
     }
   }
 };
 
-const run = () => {
+const argParser = async () => {
+  return await yargs(hideBin(process.argv)).options({
+    browser: {
+      choices: Object.values(BrowserNames),
+      default: BrowserNames.CHROME,
+      alias: "b",
+      description: "Which browser to run tests with",
+    },
+    deviceName: {
+      type: "string",
+      demandOption: true,
+      alias: "d",
+      description:
+        "Name of bluetooth device to utilize in tests. This device should be powered on and within range of the machine running this test",
+    },
+  }).argv;
+};
+
+const run = async () => {
+  const args = await argParser();
   const exDirs = getExampleDirectories(exampleFoldersDir);
-  const browserDriver = getBrowserDriver(browser);
+  const browserDriver = getBrowserDriver(args.browser);
   runServer(exampleFoldersDir);
-  runTestSuite(exDirs, browserDriver);
+  runTestSuite(exDirs, browserDriver, args.deviceName);
 };
 
 run();

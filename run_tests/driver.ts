@@ -1,16 +1,11 @@
+import { BrowserNames } from "./const";
 import { chromeDriver } from "./chrome";
-
-export const enum BrowserNames {
-  CHROME = "chrome",
-  FIREFOX = "firefox",
-  SAFARI = "safari",
-}
 
 export type BrowserDriver = {
   name: BrowserNames;
   initialize: () => Promise<void>;
   createSession: (url: string) => Promise<void>;
-  uploadDeviceCode: () => Promise<void>;
+  uploadDeviceCode: (deviceName: string) => Promise<void>;
   runInBrowserTest: () => Promise<{ result: string; logs: string }>;
   endSession: () => Promise<void>;
   shutdown: () => Promise<void>;

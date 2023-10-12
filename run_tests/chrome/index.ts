@@ -1,5 +1,6 @@
 import puppeteer, { Browser, Page } from "puppeteer";
-import { BrowserDriver, BrowserNames } from "../driver";
+import { BrowserNames } from "../const";
+import { BrowserDriver } from "../driver";
 import assert from "assert";
 
 let browser: Browser | null;
@@ -14,7 +15,8 @@ const assertPage = (page: Page | null): Page => {
   return page;
 };
 
-const operateEspruinoPage = async (page: Page) => {
+// @ts-ignore unused variable until we fix crash below
+const operateEspruinoPage = async (page: Page, deviceName: string) => {
   // dismiss "welcome" modal
   await page.locator("#guiders_overlay").click();
   // have to wait for the overlay to transition out 😞
@@ -44,7 +46,6 @@ const operateEspruinoPage = async (page: Page) => {
   // >>>>>>>
   //
   //
-  );
 };
 
 export const chromeDriver: BrowserDriver = {
@@ -58,7 +59,7 @@ export const chromeDriver: BrowserDriver = {
     mainPage = await assertBrowser(browser).newPage();
     await mainPage.goto(pageUrl);
   },
-  uploadDeviceCode: async () => {
+  uploadDeviceCode: async (deviceName: string) => {
     // open espruino tab
     await assertPage(mainPage).locator("#btn_load_code").click();
     const target = await assertBrowser(browser).waitForTarget(
@@ -69,7 +70,7 @@ export const chromeDriver: BrowserDriver = {
       throw "couldn't find loaded espruino page";
     }
     await espruinoPage.bringToFront();
-    await operateEspruinoPage(espruinoPage);
+    await operateEspruinoPage(espruinoPage, deviceName);
   },
   runInBrowserTest: async () => {
     const page = assertPage(mainPage);
