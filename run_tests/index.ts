@@ -12,6 +12,9 @@ const pathFromDirent = (dir: fs.Dirent): string => {
   return path.join(dir.path, dir.name);
 };
 
+/**
+ * Gets all directories at repo root that have an `index.html`
+ */
 const getExampleDirectories = (
   directoryPath: string,
 ): ReadonlyArray<string> => {
@@ -31,6 +34,10 @@ const getExampleDirectories = (
   return exampleFolders;
 };
 
+/**
+ * Iterates through all provided tests,
+ * skipping those known to have unique unsupported UI patterns
+ */
 const runTestSuite = (
   dirs: ReadonlyArray<string>,
   browserDriver: BrowserDriver,

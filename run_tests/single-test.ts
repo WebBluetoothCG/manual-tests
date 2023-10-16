@@ -5,6 +5,9 @@ import { BrowserDriver } from "./driver";
 
 const serverBaseUrl = `http://localhost:${serverPort}`;
 
+/**
+ * Runs a single test
+ */
 export const runSingleTest = (
   testPath: string,
   browserDriver: BrowserDriver,
