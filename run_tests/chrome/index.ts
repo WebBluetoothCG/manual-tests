@@ -99,7 +99,9 @@ export const chromeDriver: BrowserDriver = {
     await page.locator("#btn_start_test").click();
     // wait for result area to say PASS (or FAIL)
     await page.waitForFunction(
-      `document.querySelector("#test_result").innerText.length > 0`,
+      () =>
+        (document.querySelector("#test_result") as HTMLElement)?.innerText
+          .length > 0,
     );
     // grab test output in page
     const result = await Promise.all([
