@@ -6,7 +6,7 @@ let server: Server;
 
 export const runServer = (filePath: string) => {
   app.use(express.static(filePath));
-  server = app.listen(3000);
+  server = app.listen(serverPort);
 };
 
 export const stopServer = () => {

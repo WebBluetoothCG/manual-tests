@@ -1,8 +1,9 @@
 import * as path from "path";
 import t from "tap";
+import { serverPort } from "./const";
 import { BrowserDriver } from "./driver";
 
-const serverBaseUrl = "http://localhost:3000";
+const serverBaseUrl = `http://localhost:${serverPort}`;
 
 export const runSingleTest = (
   testPath: string,
