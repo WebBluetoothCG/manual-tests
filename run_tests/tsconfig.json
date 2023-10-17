@@ -10,5 +10,5 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "files": ["index.ts", "single-test.ts", "server.ts"]
+  "files": ["index.ts"]
 }
