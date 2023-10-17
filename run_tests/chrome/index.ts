@@ -114,6 +114,8 @@ export const chromeDriver: BrowserDriver = {
     await page.bringToFront();
     // press "start test" button
     await page.locator("#btn_start_test").click();
+    // TODO: bluetooth prompt navigation
+
     // wait for result area to say PASS (or FAIL)
     await page.waitForFunction(
       () =>
