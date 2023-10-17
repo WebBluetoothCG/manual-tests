@@ -85,6 +85,8 @@ export const chromeDriver: BrowserDriver = {
   initialize: async () => {
     browser = await puppeteer.launch({
       headless: false,
+      args: ["--no-startup-window"],
+      waitForInitialPage: false,
     });
   },
   createSession: async (pageUrl: string) => {
