@@ -6,13 +6,9 @@ import assert from "assert";
 let browser: Browser | null;
 let mainPage: Page | null;
 
-const assertBrowser = (browser: Browser | null): Browser => {
-  assert(browser, "Browser not launched in time");
-  return browser;
-};
-const assertPage = (page: Page | null): Page => {
-  assert(page, "Page not opened in time");
-  return page;
+const assertNotNull = <T>(subject: T | null): T => {
+  assert(subject !== null, `${typeof subject} was null`);
+  return subject;
 };
 
 const operateEspruinoPage = async (page: Page, deviceName: string) => {
@@ -91,13 +87,12 @@ export const chromeDriver: BrowserDriver = {
     });
   },
   createSession: async (pageUrl: string) => {
-    mainPage = await assertBrowser(browser).newPage();
+    mainPage = await assertNotNull(browser).newPage();
     await mainPage.goto(pageUrl);
   },
   uploadDeviceCode: async (deviceName: string) => {
     // open espruino tab
-    await assertPage(mainPage).locator("#btn_load_code").click();
-    const target = await assertBrowser(browser).waitForTarget(
+    await assertNotNull(mainPage).locator("#btn_load_code").click();
       (t) => t.url().match(/espruino\.com/) !== null,
     );
     const espruinoPage = await target?.page();
@@ -109,7 +104,7 @@ export const chromeDriver: BrowserDriver = {
     await espruinoPage.close();
   },
   runInBrowserTest: async () => {
-    const page = assertPage(mainPage);
+    const page = assertNotNull(mainPage);
     await page.bringToFront();
     // press "start test" button
     await page.locator("#btn_start_test").click();
@@ -133,10 +128,10 @@ export const chromeDriver: BrowserDriver = {
     return { result: result[0], logs: result[1] };
   },
   endSession: async () => {
-    const openPages = await assertBrowser(browser).pages();
+    const openPages = await assertNotNull(browserContext).pages();
     await openPages.map((p) => p.close());
   },
   shutdown: async () => {
-    await assertBrowser(browser).close();
+    await assertNotNull(browser).close();
   },
 };
