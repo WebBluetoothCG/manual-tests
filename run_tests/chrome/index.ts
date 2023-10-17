@@ -46,25 +46,37 @@ const operateEspruinoPage = async (page: Page, deviceName: string) => {
   //
 
   // JS version
-  const device = await page.evaluate((deviceName) => {
-    return new Promise((res) => {
-      navigator.bluetooth
-        .requestDevice({
-          filters: [{ name: deviceName }],
-        })
-        .then(res);
-    });
-  }, deviceName);
-  console.log(device);
+  // const device = await page.evaluate((deviceName) => {
+  //   return new Promise((res) => {
+  //     navigator.bluetooth
+  //       .requestDevice({
+  //         filters: [{ name: deviceName }],
+  //       })
+  //       .then(res);
+  //   });
+  // }, deviceName);
+  // console.log(device);
+
   // wait for connection to finish
-  await page.waitForSelector("#icon-deploy");
+  await page.waitForFunction(
+    () =>
+      (document.querySelector(".status__message") as HTMLElement)?.innerText
+        .toUpperCase()
+        .startsWith("CONNECTED TO"),
+  );
+  // select "flash" upload destination
+  await page.locator("#icon-deploy .icon__more").click();
+  await page.locator('#sendmethod a[title="Flash"]').click();
+  // wait for modal to go away
+  await page.waitForSelector("#sendmethod", { hidden: true });
   // click deploy button
   await page.locator("#icon-deploy").click();
   // wait for status to say 'done'
   await page.waitForFunction(
     () =>
-      (document.querySelector(".status__message") as HTMLElement)?.innerText ==
-      "READY",
+      (
+        document.querySelector(".status__message") as HTMLElement
+      )?.innerText.toUpperCase() == "SENT",
   );
 };
 
@@ -91,6 +103,7 @@ export const chromeDriver: BrowserDriver = {
     }
     await espruinoPage.bringToFront();
     await operateEspruinoPage(espruinoPage, deviceName);
+    await espruinoPage.close();
   },
   runInBrowserTest: async () => {
     const page = assertPage(mainPage);
