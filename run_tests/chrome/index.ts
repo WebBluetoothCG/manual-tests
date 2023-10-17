@@ -58,14 +58,17 @@ const operateEspruinoPage = async (page: Page, deviceName: string) => {
   // console.log(device);
 
   // wait for connection to finish
-  await page.waitForFunction(
-    () =>
-      (document.querySelector(".status__message") as HTMLElement)?.innerText
-        .toUpperCase()
-        .startsWith("CONNECTED TO"),
-  );
+  await Promise.all([
+    page.waitForFunction(
+      () =>
+        (document.querySelector(".status__message") as HTMLElement)?.innerText
+          .toUpperCase()
+          .startsWith("CONNECTED TO"),
+    ),
+    page.waitForSelector("#portselector", { hidden: true }),
+  ]);
   // select "flash" upload destination
-  await page.locator("#icon-deploy .icon__more").click();
+  await page.locator("#icon-deploy > .icon__more").click();
   await page.locator('#sendmethod a[title="Flash"]').click();
   // wait for modal to go away
   await page.waitForSelector("#sendmethod", { hidden: true });
