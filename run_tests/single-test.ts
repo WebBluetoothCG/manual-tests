@@ -1,27 +1,53 @@
 import * as path from "path";
-import t from "tap";
-import { serverPort } from "./const";
+import { tap } from "@tapjs/core";
+import { exampleFoldersDir, serverPort, testDirsToSkip } from "./const";
 import { BrowserDriver } from "./driver";
+import { runServer, stopServer } from "./server";
 
 const serverBaseUrl = `http://localhost:${serverPort}`;
+const t = tap();
 
 /**
- * Runs a single test
+ * Iterates through all provided tests,
+ * skipping those known to have unique unsupported UI patterns
  */
-export const runSingleTest = (
-  testPath: string,
+export const runTestSuite = (
+  dirs: ReadonlyArray<string>,
   browserDriver: BrowserDriver,
   deviceName: string,
 ) => {
-  t.test(testPath, async function (t) {
-    t.setTimeout(2 * 60 * 1000);
-    await browserDriver.createSession(
-      path.join(serverBaseUrl, testPath, "index.html"),
-    );
-    await browserDriver.uploadDeviceCode(deviceName);
-    const output = await browserDriver.runInBrowserTest();
-    t.debug(output.logs);
-    t.equal(output.result, "PASS");
-    t.end();
+  t.setTimeout(10 * 60 * 1000);
+  t.plan(dirs.length);
+  t.jobs = 1;
+
+  t.before(async () => {
+    runServer(exampleFoldersDir);
+    await browserDriver.initialize();
   });
+  t.after(async () => {
+    await browserDriver.shutdown();
+    stopServer();
+  });
+
+  for (let d of dirs) {
+    t.test(d, async function (t) {
+      t.setTimeout(2 * 60 * 1000);
+      t.before(async () => {
+        await browserDriver.createSession(
+          path.join(serverBaseUrl, d, "index.html"),
+        );
+      });
+      t.after(async () => {
+        await browserDriver.endSession();
+      });
+      const shouldSkip = testDirsToSkip.some((td) => td == d);
+      t.test("In-browser test passes", { skip: shouldSkip }, async () => {
+        await browserDriver.uploadDeviceCode(deviceName);
+        const output = await browserDriver.runInBrowserTest();
+        t.comment(output.logs);
+        t.equal(output.result, "PASS");
+        t.end();
+      });
+    });
+  }
 };
