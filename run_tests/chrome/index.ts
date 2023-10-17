@@ -1,9 +1,10 @@
-import puppeteer, { Browser, Page } from "puppeteer";
+import puppeteer, { Browser, BrowserContext, Page } from "puppeteer";
 import { BrowserNames } from "../const";
 import { BrowserDriver } from "../driver";
 import assert from "assert";
 
 let browser: Browser | null;
+let browserContext: BrowserContext | null;
 let mainPage: Page | null;
 
 const assertNotNull = <T>(subject: T | null): T => {
@@ -87,12 +88,15 @@ export const chromeDriver: BrowserDriver = {
     });
   },
   createSession: async (pageUrl: string) => {
-    mainPage = await assertNotNull(browser).newPage();
+    browserContext =
+      await assertNotNull(browser).createIncognitoBrowserContext();
+    mainPage = await browserContext.newPage();
     await mainPage.goto(pageUrl);
   },
   uploadDeviceCode: async (deviceName: string) => {
     // open espruino tab
     await assertNotNull(mainPage).locator("#btn_load_code").click();
+    const target = await assertNotNull(browserContext).waitForTarget(
       (t) => t.url().match(/espruino\.com/) !== null,
     );
     const espruinoPage = await target?.page();
@@ -128,10 +132,11 @@ export const chromeDriver: BrowserDriver = {
     return { result: result[0], logs: result[1] };
   },
   endSession: async () => {
-    const openPages = await assertNotNull(browserContext).pages();
-    await openPages.map((p) => p.close());
+    await assertNotNull(browserContext).close();
+    browserContext = null;
   },
   shutdown: async () => {
     await assertNotNull(browser).close();
+    browser = null;
   },
 };
