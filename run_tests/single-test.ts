@@ -14,6 +14,7 @@ export const runSingleTest = (
   deviceName: string,
 ) => {
   t.test(testPath, async function (t) {
+    t.setTimeout(2 * 60 * 1000);
     await browserDriver.createSession(
       path.join(serverBaseUrl, testPath, "index.html"),
     );

@@ -44,6 +44,7 @@ const runTestSuite = (
   deviceName: string,
 ) => {
   const t = tap();
+  t.setTimeout(10 * 60 * 1000);
   t.plan(dirs.length);
   t.jobs = 1;
   t.before(async () => {
