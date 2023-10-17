@@ -3,7 +3,7 @@ import * as path from "path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { BrowserNames, exampleFoldersDir } from "./const";
-import { runTestSuite } from "./single-test";
+import { runTestSuite } from "./test-suite";
 import { getBrowserDriver } from "./driver";
 
 const argParser = async () => {
