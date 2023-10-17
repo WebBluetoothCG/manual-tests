@@ -97,7 +97,6 @@ export const chromeDriver: BrowserDriver = {
   initialize: async () => {
     browser = await puppeteer.launch({
       headless: false,
-      // slowMo: 100,
       args: ["--no-startup-window"],
       waitForInitialPage: false,
     });
