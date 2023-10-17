@@ -16,7 +16,7 @@ export const runTestSuite = (
   browserDriver: BrowserDriver,
   deviceName: string,
 ) => {
-  t.setTimeout(10 * 60 * 1000);
+  t.setTimeout(480_000);
   t.plan(dirs.length);
   t.jobs = 1;
 
@@ -31,7 +31,7 @@ export const runTestSuite = (
 
   for (let d of dirs) {
     t.test(d, async function (t) {
-      t.setTimeout(2 * 60 * 1000);
+      t.setTimeout(30_000);
       t.before(async () => {
         await browserDriver.createSession(
           path.join(serverBaseUrl, d, "index.html"),
