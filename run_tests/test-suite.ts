@@ -42,8 +42,7 @@ export const runTestSuite = (
       });
       const shouldSkip = testDirsToSkip.some((td) => td == d);
       t.test("In-browser test passes", { skip: shouldSkip }, async () => {
-        await browserDriver.uploadDeviceCode(deviceName);
-        const output = await browserDriver.runInBrowserTest();
+        const output = await browserDriver.operateTestPage(deviceName);
         t.comment(output.logs);
         t.equal(output.result, "PASS");
         t.end();

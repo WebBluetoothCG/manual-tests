@@ -15,14 +15,12 @@ export type BrowserDriver = {
    */
   createSession: (url: string) => Promise<void>;
   /**
-   * Uploads code to the bluetooth device.
-   */
-  uploadDeviceCode: (deviceName: string) => Promise<void>;
-  /**
-   * Runs the test in the original opened page.
+   * Runs the test in the opened page.
    * @returns A tuple of the test result (either `PASS` or `FAIL`) and the logs printed out during the test.
    */
-  runInBrowserTest: () => Promise<{ result: string; logs: string }>;
+  operateTestPage: (
+    deviceName: string,
+  ) => Promise<{ result: string; logs: string }>;
   /**
    * Close webpages. Called at the end of every test.
    */
