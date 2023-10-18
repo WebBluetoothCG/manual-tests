@@ -42,12 +42,11 @@ const uploadDeviceCode = async (deviceName: string) => {
     espruinoPage.waitForDevicePrompt(),
     espruinoPage.locator('#portselector a[title="Web Bluetooth"]').click(),
   ]);
-  await devicePrompt.select(
-    await devicePrompt.waitForDevice(({ name, id }) => {
-      console.debug(`Found bluetooth device: '${name}' with id of '${id}'`);
-      return name == deviceName;
-    }),
-  );
+  const device = await devicePrompt.waitForDevice(({ name, id }) => {
+    console.debug(`Found bluetooth device: '${name}' with id of '${id}'`);
+    return name.includes(deviceName);
+  });
+  await devicePrompt.select(device);
   // -----------------------------------
 
   // wait for connection to finish
@@ -104,12 +103,11 @@ export const chromeDriver: BrowserDriver = {
       page.waitForDevicePrompt(),
       await page.locator("#btn_start_test").click(),
     ]);
-    await devicePrompt.select(
-      await devicePrompt.waitForDevice(({ name, id }) => {
-        console.debug(`Found bluetooth device: '${name}' with id of '${id}'`);
-        return name == deviceName;
-      }),
-    );
+    const device = await devicePrompt.waitForDevice(({ name, id }) => {
+      console.debug(`Found bluetooth device: '${name}' with id of '${id}'`);
+      return name.includes(deviceName);
+    });
+    await devicePrompt.select(device);
     // -----------------------------------
 
     // wait for result area to say PASS (or FAIL)
