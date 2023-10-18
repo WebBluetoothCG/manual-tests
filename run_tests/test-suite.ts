@@ -10,11 +10,14 @@ const t = tap();
 /**
  * Iterates through all provided tests,
  * skipping those known to have unique unsupported UI patterns
+ *
+ * @param deviceNameMatcher function that returns true when the given device
+ *                          name matches the one given by CLI command
  */
 export const runTestSuite = (
   dirs: ReadonlyArray<string>,
   browserDriver: BrowserDriver,
-  deviceName: string,
+  deviceNameMatcher: (deviceName: string) => boolean,
 ) => {
   t.setTimeout(480_000);
   t.plan(dirs.length);
@@ -42,7 +45,7 @@ export const runTestSuite = (
       });
       const shouldSkip = testDirsToSkip.includes(d);
       t.test("In-browser test passes", { skip: shouldSkip }, async () => {
-        const output = await browserDriver.operateTestPage(deviceName);
+        const output = await browserDriver.operateTestPage(deviceNameMatcher);
         t.comment(output.logs);
         t.equal(output.result, "PASS");
         t.end();

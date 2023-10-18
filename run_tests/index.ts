@@ -18,8 +18,9 @@ const argParser = async () => {
       type: "string",
       demandOption: true,
       alias: "d",
-      description:
-        "Name of bluetooth device to utilize in tests. This device should be powered on and within range of the machine running this test",
+      description: `Name of bluetooth device to utilize in tests.
+        This device should be powered on and within range of the machine running this test.
+        Note: the first device with a name that contains this argument will be connected to.`,
     },
   }).argv;
 };
@@ -51,7 +52,9 @@ const run = async () => {
   const args = await argParser();
   const exDirs = getExampleDirectories(exampleFoldersDir);
   const browserDriver = getBrowserDriver(args.browser);
-  runTestSuite(exDirs, browserDriver, args.deviceName);
+  runTestSuite(exDirs, browserDriver, (deviceName: string) =>
+    deviceName.includes(args.deviceName),
+  );
 };
 
 run();

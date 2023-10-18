@@ -19,7 +19,7 @@ export type BrowserDriver = {
    * @returns A tuple of the test result (either `PASS` or `FAIL`) and the logs printed out during the test.
    */
   operateTestPage: (
-    deviceName: string,
+    deviceNameMatcher: (deviceName: string) => boolean,
   ) => Promise<{ result: string; logs: string }>;
   /**
    * Close webpages. Called at the end of every test.
