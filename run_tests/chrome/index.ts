@@ -12,7 +12,6 @@ const assertNotNull = <T>(subject: T | null): T => {
   return subject;
 };
 
-// @ts-ignore
 const uploadDeviceCode = async (deviceName: string) => {
   // open espruino tab
   await assertNotNull(mainPage).locator("#btn_load_code").click();
