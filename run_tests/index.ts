@@ -38,14 +38,11 @@ const getExampleDirectories = (
     .readdirSync(directoryPath, {
       withFileTypes: true,
     })
-    .filter((f) => {
-      return (
+    .filter(
+      (f) =>
         f.isDirectory() &&
-        fs.readdirSync(pathFromDirent(f)).some((file) => {
-          return file === "index.html";
-        })
-      );
-    })
+        fs.readdirSync(pathFromDirent(f)).includes("index.html"),
+    )
     .map((f) => path.relative(exampleFoldersDir, pathFromDirent(f)));
   return exampleFolders;
 };
