@@ -35,35 +35,21 @@ const uploadDeviceCode = async (deviceName: string) => {
   ]);
   // click connect icon in top left
   await espruinoPage.locator("#icon-connection").click();
-  // click bluetooth button
-  await espruinoPage.locator('#portselector a[title="Web Bluetooth"]').click();
-  //
-  //
-  // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
-  // -----------------------------------
-  // click "Web Bluetooth" button in modal
-  // const [devicePrompt] = await Promise.all([
-  //   page.waitForDevicePrompt(),
-  //   page.locator('#portselector a[title="Web Bluetooth"]').click(),
-  // ]);
-  // devicePrompt.select(
-  //   await devicePrompt.waitForDevice(({ name }) => name.match(/puck/) !== null),
-  // );
-  // -----------------------------------
-  //
-  //
 
-  // JS version
-  // const device = await page.evaluate((deviceName) => {
-  //   return new Promise((res) => {
-  //     navigator.bluetooth
-  //       .requestDevice({
-  //         filters: [{ name: deviceName }],
-  //       })
-  //       .then(res);
-  //   });
-  // }, deviceName);
-  // console.log(device);
+  // -----------------------------------
+  // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
+  // click "Web Bluetooth" button in modal
+  const [devicePrompt] = await Promise.all([
+    espruinoPage.waitForDevicePrompt(),
+    espruinoPage.locator('#portselector a[title="Web Bluetooth"]').click(),
+  ]);
+  await devicePrompt.select(
+    await devicePrompt.waitForDevice(({ name, id }) => {
+      console.debug(`Found bluetooth device: '${name}' with id of '${id}'`);
+      return name == deviceName;
+    }),
+  );
+  // -----------------------------------
 
   // wait for connection to finish
   await Promise.all([
@@ -111,9 +97,21 @@ export const chromeDriver: BrowserDriver = {
     await uploadDeviceCode(deviceName);
     const page = assertNotNull(mainPage);
     await page.bringToFront();
+
+    // -----------------------------------
+    // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
     // press "start test" button
-    await page.locator("#btn_start_test").click();
-    // TODO: bluetooth prompt navigation
+    const [devicePrompt] = await Promise.all([
+      page.waitForDevicePrompt(),
+      await page.locator("#btn_start_test").click(),
+    ]);
+    await devicePrompt.select(
+      await devicePrompt.waitForDevice(({ name, id }) => {
+        console.debug(`Found bluetooth device: '${name}' with id of '${id}'`);
+        return name == deviceName;
+      }),
+    );
+    // -----------------------------------
 
     // wait for result area to say PASS (or FAIL)
     await page.waitForFunction(
