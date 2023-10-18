@@ -16,7 +16,7 @@ const uploadDeviceCode = async (deviceName: string) => {
   // open espruino tab
   await assertNotNull(mainPage).locator("#btn_load_code").click();
   const target = await assertNotNull(browserContext).waitForTarget(
-    ({ url }) => url().match(/espruino\.com/) !== null,
+    (t) => t.url().match(/espruino\.com/) !== null,
   );
   const espruinoPage = await target?.page();
   if (!espruinoPage) {
