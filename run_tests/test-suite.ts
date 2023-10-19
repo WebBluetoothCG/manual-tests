@@ -19,7 +19,7 @@ export const runTestSuite = (
   browserDriver: BrowserDriver,
   deviceNameMatcher: (deviceName: string) => boolean,
 ) => {
-  t.setTimeout(480_000);
+  t.setTimeout(280_000);
   t.plan(dirs.length);
   t.jobs = 1;
 
@@ -34,7 +34,9 @@ export const runTestSuite = (
 
   for (let d of dirs) {
     t.test(d, async function (t) {
-      t.setTimeout(30_000);
+      t.setTimeout(45_000);
+      const shouldSkip = testDirsToSkip.includes(d);
+
       t.before(async () => {
         await browserDriver.createSession(
           path.join(serverBaseUrl, d, "index.html"),
@@ -43,12 +45,11 @@ export const runTestSuite = (
       t.after(async () => {
         await browserDriver.endSession();
       });
-      const shouldSkip = testDirsToSkip.includes(d);
-      t.test("In-browser test passes", { skip: shouldSkip }, async () => {
+
+      t.test("in-browser test passes", { skip: shouldSkip }, async () => {
         const output = await browserDriver.operateTestPage(deviceNameMatcher);
         t.comment(output.logs);
         t.equal(output.result, "PASS");
-        t.end();
       });
     });
   }
