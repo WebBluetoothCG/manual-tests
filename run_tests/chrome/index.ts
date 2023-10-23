@@ -37,17 +37,15 @@ const uploadDeviceCode = async (
   // click connect icon in top left
   await espruinoPage.locator("#icon-connection").click();
 
-  // -----------------------------------
-  // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
   // click "Web Bluetooth" button in modal
   const [devicePrompt] = await Promise.all([
     espruinoPage.waitForDevicePrompt(),
     espruinoPage.locator('#portselector a[title="Web Bluetooth"]').click(),
   ]);
+  // find and select bluetooth device
   await devicePrompt.select(
     await devicePrompt.waitForDevice(({ name }) => deviceNameMatcher(name)),
   );
-  // -----------------------------------
 
   // wait for connection to finish
   await Promise.all([
@@ -98,17 +96,15 @@ export const chromeDriver: BrowserDriver = {
     const page = assertNotNull(mainPage);
     await page.bringToFront();
 
-    // -----------------------------------
-    // THIS CRASHES RIGHT NOW DUE TO https://github.com/puppeteer/puppeteer/issues/11072
     // press "start test" button
     const [devicePrompt] = await Promise.all([
       page.waitForDevicePrompt(),
       await page.locator("#btn_start_test").click(),
     ]);
+    // find and connect to bluetooth device
     await devicePrompt.select(
       await devicePrompt.waitForDevice(({ name }) => deviceNameMatcher(name)),
     );
-    // -----------------------------------
 
     // wait for result area to say PASS (or FAIL)
     await page.waitForFunction(
