@@ -1,6 +1,10 @@
 import { BrowserNames } from "./const";
 import { chromeDriver } from "./chrome";
 
+/**
+ * An object shape to be implemented by a driver for each browser.
+ * Each of these methods are called during a run of the test suite.
+ */
 export type BrowserDriver = {
   /**
    * The name of the browser used by this driver
