@@ -2,7 +2,7 @@
 
 This folder contains a script that will run through the tests in this repo using an automated UI integration testing approach. Because this uses a real browser with real hardware, it must be run on a machine with bluetooth functionality and a bluetooth device within range.
 
-At this time, only the Chrome implementation of this script is complete. See the "Chrome Implementation" section below for notes on how it uses [Puppeteer](https://pptr.dev/) to accomplish this. There are placeholders for future Firefox and IE implementations.
+At this time, only the Chrome implementation of this script is complete. See the ["Chrome Implementation" section](chrome-implementation-overview) below for notes on how it uses [Puppeteer](https://pptr.dev/) to accomplish this. There are placeholders for future Firefox and IE implementations.
 
 ## Exceptions
 
@@ -46,13 +46,13 @@ Test results are reported using [tap](https://node-tap.org/).
 
 Running the script without any arguments will print out documentation on the required arguments.
 
-## Chrome Implementation
+## Chrome Implementation Overview
 
-The implementation for Chrome uses Puppeteer to simulate user interactions with the webpages and bluetooth device chooser UIs. We'll describe on the bluetooth relevant parts here.
+The implementation for Chrome uses [Puppeteer](https://pptr.dev/) to simulate user interactions with the webpages and bluetooth device chooser UIs. We'll walk through the bluetooth relevant parts here.
 
 ### Launching
 
-We disable headless mode through the [launch option](https://pptr.dev/api/puppeteer.browserlaunchargumentoptions) because the current headless mode doesn't support showing the bluetooth prompt.
+When we initially launch the browser with Puppteer, we disable headless mode through the [launch option](https://pptr.dev/api/puppeteer.browserlaunchargumentoptions) because the current headless mode doesn't support showing the bluetooth prompt.
 
 ```typescript
 puppeteer.launch({
@@ -66,7 +66,7 @@ This means puppeteer will open a visible chromium browser window to run the test
 
 Once we've opened the test's espruino page with puppeteer, we can connect to the bluetooth device we're uploading code to.
 
-We use [`Page.waitForDevicePrompt()`](https://pptr.dev/api/puppeteer.page.waitfordeviceprompt/) and [Page.locator().click()] to trigger and recognize when the bluetooth device chooser popup appears. We must call `waitForDevicePrompt()` _before_ we click the button that runs the webpage's JavaScript that calls the [Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/requestDevice).
+We use [`Page.locator().click()`](https://pptr.dev/api/puppeteer.locator) to trigger the bluetooth device chooser and [`Page.waitForDevicePrompt()`](https://pptr.dev/api/puppeteer.page.waitfordeviceprompt/) to recognize when it appears. We must call `waitForDevicePrompt()` _before_ we click the button that runs the webpage's JavaScript that calls the [Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth/requestDevice).
 
 Since both of these Puppeteer methods return promises, `Promise.all()` is a convenient way to call them in the right order together:
 
@@ -93,13 +93,8 @@ await devicePrompt.select(
 );
 ```
 
-but it might more simply be written as:
-
-```typescript
-const desiredDevice = await devicePrompt.waitForDevice((potentialDevice) => {
-  return potentialDevice.name == desiredDeviceName;
-});
-await devicePrompt.select(desiredDevice);
-```
-
 Once `DevicePrompt.select()` resolves, Chrome will have connected to the device and the webpage will be able to access it.
+
+### Other Notes
+
+- We use [incognito browser contexts](https://pptr.dev/api/puppeteer.browsercontext/#example) so that permissions from one test do not affect the other.
