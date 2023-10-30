@@ -19,6 +19,8 @@ The following tests are skipped because they require steps that the other tests 
 - https://webbluetoothcg.github.io/manual-tests/watch_advertisements/ _(Requires physically restarting the espruino device during the test.)_
 - https://webbluetoothcg.github.io/manual-tests/forget_device/ _(This test requires the user to manually revoke bluetooth permissions durin the test, and has a different button to finish the test.)_
 
+These tests are configured to be skipped in [const.ts](./const.ts) in the `testDirsToSkip` array.
+
 ## Setup
 
 Install dependencies
