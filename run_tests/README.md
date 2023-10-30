@@ -15,7 +15,7 @@ This script is only intented to run through tests with a common UI pattern. This
 
 The following tests are skipped because they require steps that the other tests do not.
 
-- https://webbluetoothcg.github.io/manual-tests/get_devices/ _(This test requires the user to manually revoke bluetooth permissions durin the test, and has a different button to finish the test.)_
+- https://webbluetoothcg.github.io/manual-tests/get_devices/ _(This test requires the user to manually revoke bluetooth permissions during the test, and has a different button to finish the test.)_
 - https://webbluetoothcg.github.io/manual-tests/watch_advertisements/ _(Requires physically restarting the espruino device during the test.)_
 - https://webbluetoothcg.github.io/manual-tests/forget_device/ _(This test requires the user to manually revoke bluetooth permissions durin the test, and has a different button to finish the test.)_
 
