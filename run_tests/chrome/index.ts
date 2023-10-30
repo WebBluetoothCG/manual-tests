@@ -99,7 +99,7 @@ export const chromeDriver: BrowserDriver = {
     // press "start test" button
     const [devicePrompt] = await Promise.all([
       page.waitForDevicePrompt(),
-      await page.locator("#btn_start_test").click(),
+      page.locator("#btn_start_test").click(),
     ]);
     // find and connect to bluetooth device
     await devicePrompt.select(
