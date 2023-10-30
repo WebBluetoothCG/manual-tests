@@ -43,7 +43,3 @@ Test results are reported using [tap](https://node-tap.org/).
 ### Command Help
 
 Running the script without any arguments will print out documentation on the required arguments.
-
-```shellsession
-$ npm run tests -- -d "Pixl.js 2a52" -b chrome
-```
