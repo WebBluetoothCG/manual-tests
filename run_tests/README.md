@@ -17,7 +17,7 @@ The following tests are skipped because they require steps that the other tests 
 
 - https://webbluetoothcg.github.io/manual-tests/get_devices/ _(This test requires the user to manually revoke bluetooth permissions during the test, and has a different button to finish the test.)_
 - https://webbluetoothcg.github.io/manual-tests/watch_advertisements/ _(Requires physically restarting the espruino device during the test.)_
-- https://webbluetoothcg.github.io/manual-tests/forget_device/ _(This test requires the user to manually revoke bluetooth permissions durin the test, and has a different button to finish the test.)_
+- https://webbluetoothcg.github.io/manual-tests/forget_device/ _(This test requires the user to manually revoke bluetooth permissions during the test, and has a different button to finish the test.)_
 
 These tests are configured to be skipped in [const.ts](./const.ts) in the `testDirsToSkip` array.
 
@@ -81,7 +81,7 @@ The promise returned by `waitForDevicePrompt()` resolves to a [DeviceRequestProm
 
 ### Selecting a device
 
-We use [`DeviceRequestPrompt.waitForDevice()`](https://pptr.dev/api/puppeteer.devicerequestprompt.waitfordevice) and [`DeviceRequestPrompt.select()`](https://pptr.dev/api/puppeteer.devicerequestprompt.select) to find and connect to the bluetooth deice we want.
+We use [`DeviceRequestPrompt.waitForDevice()`](https://pptr.dev/api/puppeteer.devicerequestprompt.waitfordevice) and [`DeviceRequestPrompt.select()`](https://pptr.dev/api/puppeteer.devicerequestprompt.select) to find and connect to the bluetooth device we want.
 
 `DevicePrompt.waitForDevice()` calls the supplied callback each time Chrome finds a bluetooth device it could connect to with some basic info about the device. The first time the callback returns `true`, `waitForDevice()` will resolve to the matched `DeviceRequestPromptDevice`. We then pass that device to `DevicePrompt.select()` to have Puppeteer actually connect to that bluetooth device.
 
