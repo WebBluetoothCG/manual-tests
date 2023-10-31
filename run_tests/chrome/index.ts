@@ -1,5 +1,5 @@
 import puppeteer, { Browser, BrowserContext, Page } from "puppeteer";
-import { BrowserNames } from "../const";
+import { BrowserNames, puppeteerInteractionTimeout } from "../const";
 import { BrowserDriver } from "../driver";
 import assert from "assert";
 
@@ -24,6 +24,7 @@ const uploadDeviceCode = async (
   if (!espruinoPage) {
     throw "couldn't find loaded espruino page";
   }
+  espruinoPage.setDefaultTimeout(puppeteerInteractionTimeout);
   await espruinoPage.bringToFront();
   // dismiss "welcome" modal
   await espruinoPage.locator("#guiders_overlay").click();
@@ -84,6 +85,7 @@ export const chromeDriver: BrowserDriver = {
     browserContext =
       await assertNotNull(browser).createIncognitoBrowserContext();
     mainPage = await browserContext.newPage();
+    mainPage.setDefaultTimeout(puppeteerInteractionTimeout);
     await mainPage.goto(pageUrl);
   },
   operateTestPage: async (

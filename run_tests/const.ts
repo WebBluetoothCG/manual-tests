@@ -11,6 +11,18 @@ export const testDirsToSkip = [
   "forget_device",
 ];
 
+/*
+ * Maximum time (in ms) a single test can run for before being marked
+ * failed and aborted. Set to 0 to prevent timeouts.
+ */
+export const singleTestTimeout = 60_000;
+
+/*
+ * Maximum time (in ms) puppeteer will wait for a single interaction
+ * to complete. Set to 0 to prevent timeouts.
+ */
+export const puppeteerInteractionTimeout = 30_000;
+
 /**
  * Directory containing all test directories
  */

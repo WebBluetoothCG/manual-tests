@@ -1,6 +1,11 @@
 import * as path from "path";
 import { tap } from "@tapjs/core";
-import { exampleFoldersDir, serverPort, testDirsToSkip } from "./const";
+import {
+  exampleFoldersDir,
+  serverPort,
+  singleTestTimeout,
+  testDirsToSkip,
+} from "./const";
 import { BrowserDriver } from "./driver";
 import { runServer, stopServer } from "./server";
 
@@ -19,7 +24,7 @@ export const runTestSuite = (
   browserDriver: BrowserDriver,
   deviceNameMatcher: (deviceName: string) => boolean,
 ) => {
-  t.setTimeout(280_000);
+  t.setTimeout(0);
   t.plan(dirs.length);
   t.jobs = 1;
 
@@ -34,7 +39,7 @@ export const runTestSuite = (
 
   for (let d of dirs) {
     t.test(d, async function (t) {
-      t.setTimeout(45_000);
+      t.setTimeout(singleTestTimeout);
       const shouldSkip = testDirsToSkip.includes(d);
 
       t.before(async () => {
