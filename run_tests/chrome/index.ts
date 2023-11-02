@@ -77,7 +77,7 @@ export const chromeDriver: BrowserDriver = {
   initialize: async () => {
     browser = await puppeteer.launch({
       headless: false,
-      args: ["--no-startup-window"],
+      args: ["--no-startup-window", "--enable-features=WebBluetooth"],
       waitForInitialPage: false,
     });
   },
