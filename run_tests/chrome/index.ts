@@ -29,9 +29,11 @@ const uploadDeviceCode = async (
   // dismiss "welcome" modal
   await espruinoPage.locator("#guiders_overlay").click();
   // have to wait for the overlay to transition out 😞
-  espruinoPage.waitForSelector("#guiders_overlay", { hidden: true });
+  await espruinoPage.waitForSelector("#guiders_overlay", { hidden: true });
   // wait a moment for the pages feature detection logic to run
-  await new Promise((res) => setTimeout(res, 500));
+  await espruinoPage.waitForFunction(() =>
+    navigator.bluetooth.getAvailability(),
+  );
   // click connect icon in top left
   await espruinoPage.locator("#icon-connection").click();
 
