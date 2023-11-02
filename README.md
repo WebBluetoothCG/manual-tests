@@ -36,4 +36,4 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Automated Test Running
 
-Pleae see [./run-tests/README.md](./run-tests/README.md).
+Please see [./run-tests/README.md](./run-tests/README.md).

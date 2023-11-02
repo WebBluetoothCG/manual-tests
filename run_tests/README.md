@@ -1,6 +1,6 @@
 # Automated Testing Script
 
-This folder contains a script that will run through the tests in this repo using an automated UI integration testing approach. Because this uses a real browser with real hardware, it must be run on a machine with bluetooth functionality and a bluetooth device within range.
+This folder contains a script that will run through the tests in this repo using an automated UI integration testing approach. Because this uses a real browser with real hardware, it must be run on a machine with Bluetooth functionality and a bluetooth device within range.
 
 At this time, only the Chrome implementation of this script is complete. See the ["Chrome Implementation" section](chrome-implementation-overview) below for notes on how it uses [Puppeteer](https://pptr.dev/) to accomplish this. There are placeholders for future Firefox and IE implementations.
 
@@ -40,7 +40,7 @@ The script requires two arguments:
 $ npm run tests -- -d "Pixl.js 2a52" -b chrome
 ```
 
-Test results are reported using [tap](https://node-tap.org/).
+Test results are reported using [TAP](https://node-tap.org/).
 
 ### Command Help
 
@@ -60,7 +60,7 @@ puppeteer.launch({
 });
 ```
 
-This means puppeteer will open a visible chromium browser window to run the test.
+This means puppeteer will open a visible Chrome browser window to run the test.
 
 ### Opening the bluetooth device prompt
 
