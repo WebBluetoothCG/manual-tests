@@ -33,3 +33,7 @@ privileges to install software, and on Chrome OS, phones, etc.
 ## Contributions
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Automated Test Running
+
+Please see [./run-tests/README.md](./run-tests/README.md).
